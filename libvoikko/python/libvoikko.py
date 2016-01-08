@@ -180,6 +180,8 @@ class Voikko(object):
 	def __getLib():
 		if os.name == 'nt':
 			return CDLL("libvoikko-1.dll")
+		elif sys.platform == 'darwin':
+			fileName = "libvoikko.1.dylib"
 		else:
 			return CDLL("libvoikko.so.1")
 	__getLib = staticmethod(__getLib)
