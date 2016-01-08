@@ -36,6 +36,7 @@
 
 #ifdef HAVE_VFST
 #include "morphology/VfstAnalyzer.hpp"
+#include "morphology/FinnishVfstAnalyzer.hpp"
 #endif
 
 #ifdef HAVE_HFST
@@ -46,7 +47,7 @@
 #include "morphology/LttoolboxAnalyzer.hpp"
 #endif
 
-using namespace std;
+using std::string;
 
 namespace libvoikko { namespace morphology {
 
@@ -62,9 +63,14 @@ Analyzer * AnalyzerFactory::getAnalyzer(const setup::Dictionary & dictionary)
 		return new MalagaAnalyzer(morPath);
 	}
 	#endif
-	#ifdef HAVE_VFST
+	#ifdef HAVE_EXPERIMENTAL_VFST
 	if (morBackend == "vfst") {
 		return new VfstAnalyzer(morPath);
+	}
+	#endif
+	#ifdef HAVE_VFST
+	if (morBackend == "finnishVfst") {
+		return new FinnishVfstAnalyzer(morPath);
 	}
 	#endif
 	#ifdef HAVE_HFST

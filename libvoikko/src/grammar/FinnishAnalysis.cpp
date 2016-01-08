@@ -74,7 +74,7 @@ void FinnishAnalysis::analyseToken(Token * token) {
 	    utils::StringUtils::stripSpecialCharsForMalaga(token->str,
 	                                                   token->tokenlen);
 	morphology::Analyzer * analyzer = voikkoOptions->morAnalyzer;
-	list<morphology::Analysis *> * analyses = analyzer->analyze(wordBuffer);
+	list<morphology::Analysis *> * analyses = analyzer->analyze(wordBuffer, wcslen(wordBuffer), false);
 	delete[] wordBuffer;
 	
 	list<morphology::Analysis *>::const_iterator it = analyses->begin();
@@ -101,7 +101,7 @@ void FinnishAnalysis::analyseToken(Token * token) {
 		}
 		
 		if (wclass && (wcscmp(L"sidesana", wclass) == 0 ||
-		    (wcscmp(L"kieltosana", wclass) == 0 && token->str[token->tokenlen - 1] == L'ä'))) { // "enkä", "etkä", "eikä" = "ja en", ...
+		    (wcscmp(L"kieltosana", wclass) == 0 && token->str[token->tokenlen - 1] == L'\u00e4'))) { // "enkä", "etkä", "eikä" = "ja en", ...
 			token->possibleConjunction = true;
 		}
 		else {

@@ -42,7 +42,7 @@ import org.junit.Test;
 
 public class VoikkoTest {
 
-    private static final int DEPRECATED_MAX_ANALYSIS_COUNT = 31;
+    private static final int DEPRECATED_MAX_ANALYSIS_COUNT = 100; // for Finnish VFST backend
     private static final int DEPRECATED_MAX_WORD_CHARS = 255;
     private Voikko voikko;
 
@@ -82,11 +82,11 @@ public class VoikkoTest {
     
     @Test
     public void dictionaryComparisonWorks() {
-        Dictionary d1 = new Dictionary("fi", "a", "b");
-        Dictionary d2 = new Dictionary("fi", "a", "c");
-        Dictionary d3 = new Dictionary("fi", "c", "b");
-        Dictionary d4 = new Dictionary("fi", "a", "b");
-        Dictionary d5 = new Dictionary("sv", "a", "b");
+        Dictionary d1 = new Dictionary("fi", "", "a", "b");
+        Dictionary d2 = new Dictionary("fi", "", "a", "c");
+        Dictionary d3 = new Dictionary("fi", "", "c", "b");
+        Dictionary d4 = new Dictionary("fi", "", "a", "b");
+        Dictionary d5 = new Dictionary("sv", "", "a", "b");
         assertFalse(d1.equals("kissa"));
         assertFalse("kissa".equals(d1));
         assertFalse(d1.equals(d2));
@@ -100,11 +100,11 @@ public class VoikkoTest {
     
     @Test
     public void dictionaryHashCodeWorks() {
-        Dictionary d1 = new Dictionary("fi", "a", "b");
-        Dictionary d2 = new Dictionary("fi", "a", "c");
-        Dictionary d3 = new Dictionary("fi", "c", "b");
-        Dictionary d4 = new Dictionary("fi", "a", "b");
-        Dictionary d5 = new Dictionary("sv", "a", "b");
+        Dictionary d1 = new Dictionary("fi", "", "a", "b");
+        Dictionary d2 = new Dictionary("fi", "", "a", "c");
+        Dictionary d3 = new Dictionary("fi", "", "c", "b");
+        Dictionary d4 = new Dictionary("fi", "", "a", "b");
+        Dictionary d5 = new Dictionary("sv", "", "a", "b");
         assertTrue(d1.hashCode() != d2.hashCode());
         assertTrue(d1.hashCode() != d3.hashCode());
         assertTrue(d4.hashCode() != d5.hashCode());
@@ -448,7 +448,7 @@ public class VoikkoTest {
     }
     
     @Test
-    public void OverLongWordsAreNotAnalyzed() {
+    public void overLongWordsAreNotAnalyzed() {
         // This tests backend specific deprecated functionality.
         StringBuilder complexWord = new StringBuilder();
         for (int i = 0; i < 25; i++) {
@@ -460,6 +460,19 @@ public class VoikkoTest {
         complexWord.append("kuraattori");
         assertTrue(complexWord.length() > DEPRECATED_MAX_WORD_CHARS);
         assertEquals(0, voikko.analyze(complexWord.toString()).size());
+    }
+    
+    @Test
+    public void tokenizationWorksForHugeParagraphs() {
+        final String seedSentence = "Kissa on 29 vuotta vanha... Onhan se silloin vanha. ";
+        final int tokensInSeed = 20;
+        final int repeats = 10000;
+        StringBuilder hugeParagraph = new StringBuilder(seedSentence.length() * repeats);
+        for (int i = 0; i < repeats; i++) {
+            hugeParagraph.append(seedSentence);
+        }
+        List<Token> tokens = voikko.tokens(hugeParagraph.toString());
+        assertEquals(tokensInSeed * repeats, tokens.size());
     }
     
     @Test

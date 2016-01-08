@@ -35,8 +35,6 @@
 #include <vector>
 #include <string>
 #include <stdint.h>
-#include "fst/Transition.hpp"
-#include "fst/Configuration.hpp"
 
 namespace libvoikko { namespace fst {
 	
@@ -54,29 +52,31 @@ namespace libvoikko { namespace fst {
 		uint16_t value;
 	};
 	
+	const uint16_t FlagValueNeutral = 0;
+	const uint16_t FlagValueAny = 1;
+	const uint32_t MAX_LOOP_COUNT = 100000;
+	
 	class Transducer {
-		private:
+		protected:
 			size_t fileLength;
 			void * map;
 			bool byteSwapped;
-			Transition * transitionStart;
-			std::map<std::string, uint16_t> stringToSymbol;
-			std::vector<const char *> symbolToString;
-			uint16_t firstMultiChar;
+			
+			OpFeatureValue getDiacriticOperation(const std::string & symbol, std::map<std::string, uint16_t> & features, std::map<std::string, uint16_t> & values);
+			void * vfstMmap(const char * filePath, size_t & fileLength);
+			void vfstMunmap(void * map, size_t fileLength);
+			bool checkNeedForByteSwapping(const char * filePtr);
+			bool isWeightedTransducerFile(const char * filePtr);
 		public:
-			std::vector<OpFeatureValue> symbolToDiacritic;
 			uint16_t flagDiacriticFeatureCount;
 			uint16_t firstNormalChar;
-			
-			Transducer(const char * filePath);
-			
-			bool prepare(Configuration * configuration, const char * input, size_t inputLen) const;
-			
-			bool next(Configuration * configuration, char * outputBuffer, size_t bufferLen) const;
+			std::vector<OpFeatureValue> symbolToDiacritic;
 			
 			uint16_t getFlagDiacriticFeatureCount() const;
 			
 			void terminate();
+			
+			virtual ~Transducer();
 	};
 } }
 

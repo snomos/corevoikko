@@ -57,6 +57,11 @@ static bool isMatchingLanguage(const LanguageTag & requested, const LanguageTag 
 	if (requested.getLanguage() != available.getLanguage()) {
 		return false;
 	}
+	if (requested.getScript() != available.getScript()) {
+		// TODO: would be reasonable to expand missing script into the default script
+		// for the language
+		return false;
+	}
 	if (requested.getPrivateUse() == "standard" && available.getPrivateUse().empty()) {
 		return true;
 	}
@@ -104,7 +109,8 @@ Dictionary DictionaryFactory::load(const string & language) throw(DictionaryExce
 
 Dictionary DictionaryFactory::load(const string & language, const string & path)
 		throw(DictionaryException) {
-	LanguageTag requestedTag = parseFromBCP47(language);
+	LanguageTag requestedTag;
+	requestedTag.setBcp47(language);
 	
 	list<Dictionary> dicts = findAllAvailable(path);
 	if (dicts.empty()) {
@@ -130,40 +136,6 @@ Dictionary DictionaryFactory::load(const string & language, const string & path)
 	throw DictionaryException("Specified dictionary variant was not found");
 }
 
-LanguageTag DictionaryFactory::parseFromBCP47(const string & language) {
-	// TODO: this parsing algorithm is incomplete
-	LanguageTag tag;
-	if (language.size() < 2) {
-		return tag;
-	}
-	
-	string canonicalLanguage = language;
-	DictionaryLoader::tagToCanonicalForm(canonicalLanguage);
-	
-	size_t languageEnd = canonicalLanguage.find("-");
-	if (languageEnd == string::npos) {
-		tag.setLanguage(canonicalLanguage);
-	} else {
-		if (languageEnd < 2) {
-			// Invalid tag "-..." or "f-..."
-			return tag;
-		}
-		tag.setLanguage(canonicalLanguage.substr(0, languageEnd));
-	}
-	
-	size_t privateUseStart = canonicalLanguage.find("-x-");
-	if (privateUseStart != string::npos) {
-		string privateUse = canonicalLanguage.substr(privateUseStart + 3);
-		for (size_t hyphenPos = privateUse.find("-"); hyphenPos != string::npos;
-		            hyphenPos = privateUse.find("-")) {
-			privateUse.erase(hyphenPos, 1);
-		}
-		tag.setPrivateUse(privateUse);
-	}
-	
-	return tag;
-}
-
 void DictionaryFactory::addAllVersionVariantsFromPath(const string & path, map<string, Dictionary> & variants) {
 	list<DictionaryLoader*> loaders;
 	#ifdef HAVE_VFST
@@ -175,7 +147,9 @@ void DictionaryFactory::addAllVersionVariantsFromPath(const string & path, map<s
 	#ifdef HAVE_HFST
 		loaders.push_back(new V3DictionaryLoader());
 	#endif
-	loaders.push_back(new V2DictionaryLoader());
+	#ifdef HAVE_MALAGA
+		loaders.push_back(new V2DictionaryLoader());
+	#endif
 	
 	for (list<DictionaryLoader*>::iterator i = loaders.begin(); i != loaders.end(); ++i) {
 		(*i)->addVariantsFromPath(path, variants);
@@ -188,6 +162,9 @@ void DictionaryFactory::addAllVersionVariantsFromPath(const string & path, map<s
  * elements into a list.
  */
 static void splitPathAndAppend(string combinedPath, list<string> & locations) {
+	if (combinedPath == "") {
+		return;
+	}
 	#ifdef WIN32
 	char pathSeparator = ';';
 	#else

@@ -44,11 +44,11 @@ class LibvoikkoTest(unittest.TestCase):
 		self.failIf(self.voikko.spell(u"amifostiini"))
 	
 	def testDictionaryComparisonWorks(self):
-		d1 = Dictionary(u"fi", u"a", u"b")
-		d2 = Dictionary(u"fi", u"a", u"c")
-		d3 = Dictionary(u"fi", u"c", u"b")
-		d4 = Dictionary(u"fi", u"a", u"b")
-		d5 = Dictionary(u"sv", u"a", u"b")
+		d1 = Dictionary(u"fi", u"", u"a", u"b")
+		d2 = Dictionary(u"fi", u"", u"a", u"c")
+		d3 = Dictionary(u"fi", u"", u"c", u"b")
+		d4 = Dictionary(u"fi", u"", u"a", u"b")
+		d5 = Dictionary(u"sv", u"", u"a", u"b")
 		self.assertNotEqual(u"kissa", d1)
 		self.assertNotEqual(d1, u"kissa")
 		self.assertNotEqual(d1, d2)
@@ -60,11 +60,11 @@ class LibvoikkoTest(unittest.TestCase):
 		self.failUnless(d4 < d5)
 	
 	def testDictionaryHashCodeWorks(self):
-		d1 = Dictionary(u"fi", u"a", u"b")
-		d2 = Dictionary(u"fi", u"a", u"c")
-		d3 = Dictionary(u"fi", u"c", u"b")
-		d4 = Dictionary(u"fi", u"a", u"b")
-		d5 = Dictionary(u"sv", u"a", u"b")
+		d1 = Dictionary(u"fi", u"", u"a", u"b")
+		d2 = Dictionary(u"fi", u"", u"a", u"c")
+		d3 = Dictionary(u"fi", u"", u"c", u"b")
+		d4 = Dictionary(u"fi", u"", u"a", u"b")
+		d5 = Dictionary(u"sv", u"", u"a", u"b")
 		self.assertNotEqual(hash(d1), hash(d2))
 		self.assertNotEqual(hash(d1), hash(d3))
 		self.assertNotEqual(hash(d4), hash(d5))
@@ -77,6 +77,10 @@ class LibvoikkoTest(unittest.TestCase):
 		self.assertEqual(u"standard", standard.variant,
 		     u"Standard dictionary must be the default in test environment.")
 	
+	def testListSupportedSpellingLanguagesWithoutPath(self):
+		langs = Voikko.listSupportedSpellingLanguages()
+		self.failUnless(u"fi" in langs, u"Finnish dictionary must be present in the test environment")
+	
 	def testListDictsWithPathAndAttributes(self):
 		info = MorphologyInfo()
 		info.variant = u"test-variant-name"
@@ -86,11 +90,12 @@ class LibvoikkoTest(unittest.TestCase):
 		dataDir.createMorphology(info.variant, info)
 		dicts = Voikko.listDicts(dataDir.getDirectory())
 		dataDir.tearDown()
-		dictsWithCorrectVariant = filter(lambda aDict: aDict.variant == info.variant, dicts)
+		dictsWithCorrectVariant = list(filter(lambda aDict: aDict.variant == info.variant, dicts))
 		self.assertEqual(1, len(dictsWithCorrectVariant))
 		theDict = dictsWithCorrectVariant[0]
 		self.assertEqual(info.description, theDict.description)
 		self.assertEqual(u"fi", theDict.language)
+		self.assertEqual(u"", theDict.script)
 	
 	def testInitWithCorrectDictWorks(self):
 		self.voikko.terminate()
@@ -202,6 +207,12 @@ class LibvoikkoTest(unittest.TestCase):
 		self.voikko.setIgnoreDot(False)
 		self.failIf(self.voikko.spell(u"kissa."))
 		self.voikko.setIgnoreDot(True)
+		self.failUnless(self.voikko.spell(u"kissa."))
+	
+	def testSetBooleanOption(self):
+		self.voikko.setBooleanOption(0, False) # This is "ignore dot"
+		self.failIf(self.voikko.spell(u"kissa."))
+		self.voikko.setBooleanOption(0, True)
 		self.failUnless(self.voikko.spell(u"kissa."))
 	
 	def testSetIgnoreNumbers(self):

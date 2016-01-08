@@ -30,10 +30,12 @@ package org.puimula.libvoikko;
 
 import static org.puimula.libvoikko.ByteArray.n2s;
 import static org.puimula.libvoikko.ByteArray.s2n;
+import static org.puimula.libvoikko.ByteArray.s2bb;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.nio.ByteBuffer;
 
 import org.puimula.libvoikko.Libvoikko.VoikkoGrammarError;
 import org.puimula.libvoikko.Libvoikko.VoikkoHandle;
@@ -76,7 +78,7 @@ public class Voikko {
             for (String libName : LIBRARY_NAMES) {
                 NativeLibrary nativeLibrary = tryLoadLibrary(libName);
                 if (nativeLibrary != null) {
-                    library = (Libvoikko) Native.loadLibrary(nativeLibrary.getFile().getAbsolutePath(), Libvoikko.class);
+                    library = (Libvoikko) Native.loadLibrary(nativeLibrary.getFile().getPath(), Libvoikko.class);
                     return library;
                 }
             }
@@ -174,6 +176,7 @@ public class Voikko {
         List<Dictionary> dicts = new ArrayList<Dictionary>(pointerArray.length);
         for (Pointer cDict : pointerArray) {
             dicts.add(new Dictionary(lib.voikko_dict_language(cDict).toString(),
+                    lib.voikko_dict_script(cDict).toString(),
                     lib.voikko_dict_variant(cDict).toString(), lib.voikko_dict_description(cDict).toString()));
         }
         lib.voikko_free_dicts(cDicts);
@@ -325,18 +328,22 @@ public class Voikko {
     private List<Token> tokensNonNull(String text) {
         Libvoikko lib = getLib();
         List<Token> result = new ArrayList<Token>();
-        byte[] textBytes = s2n(text);
-        int textLen = textBytes.length - 1;
+        ByteBuffer textBytes = s2bb(text);
+        int bytesStart = 0;
+        int textStart = 0;
+        int bytesLen = textBytes.capacity() - 1;
         SizeTByReference tokenLenByRef = new SizeTByReference();
-        while (textLen > 0) {
-            int tokenTypeInt = lib.voikkoNextTokenCstr(handle, textBytes, new SizeT(textLen), tokenLenByRef);
+        while (bytesLen > 0) {
+            textBytes.position(bytesStart);
+            int tokenTypeInt = lib.voikkoNextTokenCstr(handle, textBytes, new SizeT(bytesLen), tokenLenByRef);
             int tokenLen = tokenLenByRef.getValue().intValue();
             TokenType tokenType = TokenType.values()[tokenTypeInt];
-            String tokenText = text.substring(0, tokenLen);
+            String tokenText = text.substring(textStart, textStart + tokenLen);
             result.add(new Token(tokenType, tokenText));
-            text = text.substring(tokenLen);
-            textBytes = s2n(text);
-            textLen = textBytes.length - 1;
+            textStart += tokenText.length();
+            int tokenBytes = s2n(tokenText).length - 1;
+            bytesStart += tokenBytes;
+            bytesLen -= tokenBytes;
         }
         return result;
     }

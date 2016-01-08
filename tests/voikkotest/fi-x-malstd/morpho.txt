@@ -674,6 +674,8 @@ word:lienen
     CLASS=teonsana
     NUMBER=singular
     PERSON=1
+    MOOD=potential
+    NEGATIVE=false
 word:älkööt
   expected:1
   analysis
@@ -941,4 +943,64 @@ word:ratakorkeus
  expected:1
  !POSSIBLE_GEOGRAPHICAL_NAME
 word:esikarsinta
+ expected:1
+word:kpl:in
+ expected:2
+  analysis
+   SIJAMUOTO=omanto
+  analysis
+   SIJAMUOTO=keinonto
+word:Kissalaitos
+ expected:2
+  analysis
+   STRUCTURE==ppppp=pppppp
+  analysis
+   STRUCTURE==ipppp=pppppp
+word:-kissalaitos
+ expected:1
+  analysis
+   STRUCTURE=-=ppppp=pppppp
+word:väylänopeus
+ expected:1
+ !POSSIBLE_GEOGRAPHICAL_NAME
+word:VI:t
+ expected:1
+ analysis
+  NUMBER=plural
+  SIJAMUOTO=nimento
+word:sairastumisriski
+ expected:1
+ analysis
+  CLASS=nimisana
+word:-litraisilla
+ expected:1
+word:hullunkurisia
+ expected:1
+word:aihekokonaisuus
+ expected:1
+word:ajantasaisuus
+ expected:1
+word:ilmoituskokonaisuus
+ expected:1
+word:juoksijakokonaisuus
+ expected:1
+word:kerrostalokokonaisuus
+ expected:1
+word:turkulaiskokonaisuus
+ expected:1
+word:Matti-kokonaisuus
+ expected:1
+word:englantilaistyyppinen
+ expected:1
+word:Matti-tyyppinen
+ expected:1
+word:miellyttämishaluinen
+ expected:1
+word:tapauskohtainen
+ expected:1
+word:epävarmuuden
+ expected:1
+word:asiantuntijuus
+ expected:1
+word:asianmyyjyys
  expected:1

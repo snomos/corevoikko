@@ -38,6 +38,11 @@
 #include "spellchecker/HfstSpeller.hpp"
 #endif
 
+#ifdef HAVE_EXPERIMENTAL_VFST
+#include "spellchecker/VfstSpeller.hpp"
+#include "spellchecker/VfstSuggestion.hpp"
+#endif
+
 using namespace std;
 
 namespace libvoikko { namespace spellchecker { namespace suggestion {
@@ -61,6 +66,15 @@ SuggestionGenerator * SuggestionGeneratorFactory::getSuggestionGenerator(
 	if (backend == "hfst") {
 		const HfstSpeller * hfstSpeller = dynamic_cast<HfstSpeller *>(voikkoOptions->speller);
 		return new HfstSuggestion(hfstSpeller->speller);
+	}
+	#endif
+	#ifdef HAVE_EXPERIMENTAL_VFST
+	if (backend == "vfst") {
+		const VfstSpeller * vfstSpeller = dynamic_cast<VfstSpeller *>(voikkoOptions->speller);
+		if (!vfstSpeller) {
+			throw setup::DictionaryException("VFST suggestion generator works only with VFST speller");
+		}
+		return new VfstSuggestion(vfstSpeller->transducer, voikkoOptions->dictionary.getMorBackend().getPath());
 	}
 	#endif
 	throw setup::DictionaryException("Failed to create suggestion generator because of unknown suggestion generator backend");

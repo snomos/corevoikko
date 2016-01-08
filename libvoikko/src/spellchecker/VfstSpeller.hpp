@@ -31,7 +31,7 @@
 
 #include "spellchecker/Speller.hpp"
 #include "setup/DictionaryException.hpp"
-#include "fst/Transducer.hpp"
+#include "fst/WeightedTransducer.hpp"
 #include "fst/Configuration.hpp"
 #include <string>
 
@@ -45,11 +45,12 @@ class VfstSpeller : public Speller {
 		VfstSpeller(const std::string & directoryName) throw(setup::DictionaryException);
 		spellresult spell(const wchar_t * word, size_t wlen);
 		void terminate();
+		
+		fst::WeightedTransducer * transducer;
 	private:
 		/** Return SPELL_FAILED or SPELL_OK depending on whether given word is correct as is. */
 		spellresult doSpell(const wchar_t * word, size_t wlen);
-		fst::Transducer * transducer;
-		fst::Configuration * configuration;
+		fst::WeightedConfiguration * configuration;
 		char * outputBuffer;
 };
 

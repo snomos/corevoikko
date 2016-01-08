@@ -270,6 +270,10 @@ static int list_dicts(const char * path) {
 	}
 	for (voikko_dict ** i = dicts; *i; i++) {
 		cout << voikko_dict_language(*i);
+		string script(voikko_dict_script(*i));
+		if (script != "") {
+			cout << "-" << script;
+		}
 		cout << "-x-";
 		cout << voikko_dict_variant(*i);
 		cout << ": ";
@@ -481,6 +485,7 @@ int main(int argc, char ** argv) {
 	
 	// Use stdout in wide character mode and stderr in narrow character mode.
 	setlocale(LC_ALL, "");
+	wcout.imbue(locale(""));
 	fwide(stdout, 1);
 	fwide(stderr, -1);
 	initThreads();

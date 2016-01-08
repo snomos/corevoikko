@@ -1,0 +1,46 @@
+! Voikko-fi, suomen kielen muoto-opin kuvaus.
+!
+! Tekijänoikeus © 2006 - 2015 Hannu Väisänen (Etunimi.Sukunimi@joensuu.fi)
+!                 2006 - 2015 Harri Pitkänen (hatapitk@iki.fi)
+!
+! This program is free software; you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation; either version 2, or (at your option)
+! any later version.
+!
+! This program is distributed in the hope that it will be useful, but
+! WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+! General Public License for more details.
+!
+! You should have received a copy of the GNU General Public License
+! along with this program; see the file COPYING.  If not, write to the
+! Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+! 02110-1301, USA.
+
+LEXICON Suhdesana
+[Ld][Xp]ali[X]ali:ali	Liitesana_a	;
+[Ld][Xp]ali[X]alitse:alitse	Liitesana_a	;
+[Ld][Xp]alla[X]a:a	Ulkopaikallissijat_Yks_a	;
+[Ld][Xp]ammolla[X]ammolleen:ammolleen	Liitesana_a	;
+[Ld][Xp]ammolla[X]ammollaan:ammollaan	Liitesana_a	;
+[Ld][Xp]asemesta[X]asemesta:asemesta	Liitesana_a	;
+[Ld][Xp]asti[X]asti:asti	Liitesana_a	;
+[Ld][Xp]huolimatta[X]huolimatta:huolimatta	Loppu	;
+[Ld][Xp]ilman[X]ilman:ilman	Liitesana_a	;
+[Ld][Xp]kanssa[X]kanssa:kanssa	LoppuLiitesanaOlV_a	;
+[Ld][Xp]kautta[X]kautta:kautta	LoppuLiitesanaOlV_a	;
+[Ld][Xp]kera[X]kera:kera	Loppu	;
+[Ld][Xp]kera[X]keralla:keralla	LoppuOlV_a	;
+[Ld][Xp]kera[X]keralle:keralle	Liitesana_a	;
+[Ld][Xp]keskuudessa[X]keskuude:keskuude	SisäpaikallissijatSsaSta_a	;
+[Ld][Xp]keskuudessa[X]keskuute[Sill][Ny]e:keskuutee	NimisanaLiOlN_a	;
+[Ld][Xp]kohden[X]kohden:kohden	Liitesana_a	;
+[Ld][Xp]kohti[X]kohti:kohti	Liitesana_a	;
+[Ld][Xp]luota[X]luota:luota	LoppuLiitesanaOlV_a	;
+[Ld][Xp]ohi[X]ohe:ohe	Ulkopaikallissijat_Yks_a	;
+[Ld][Xp]ohi[X]ohe:ohe	SisäpaikallissijatVn_a	;
+[Ld][Xp]ohi[X]ohi:ohi	Liitesana_a	;
+[Ld][Xp]varten[X]varten:varten	Liitesana_a	;
+[Ld][Xp]yli[X]yli:yli	Liitesana_ä	;
+[Ld][Xp]yli[X]ylitse:ylitse	LoppuLiitesanaOlV_ä	;

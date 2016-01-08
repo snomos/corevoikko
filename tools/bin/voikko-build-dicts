@@ -1,10 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright 2008 - 2012 Harri Pitkänen (hatapitk@iki.fi)
+# Copyright 2008 - 2015 Harri Pitkänen (hatapitk@iki.fi)
 # Script for automating the build of multiple dictionary variants for
 # Voikko. This script should be run in the main directory of
-# Suomi-malaga source package.
+# voikko-fi source package.
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -42,10 +42,10 @@ def indexHeader(indexFile):
 	indexFile.write(u"table {border-collapse:collapse;}")
 	indexFile.write(u"table td {border:1px solid black;}")
 	indexFile.write(u"</style></head>")
-	indexFile.write(u"<body><h1>Voikon sanaston testiversioita</h1>")
+	indexFile.write(u"<body><h1>Voikon sanaston testiversioita (sanastoformaatin versio 5)</h1>")
 	indexFile.write(u"<p>Tämä sivu ja sivulla olevat Voikon sanaston testiversiot ")
 	indexFile.write(u"on generoitu automaattisesti ohjelmalla <kbd>voikko-build-dicts</kbd>. ")
-	indexFile.write(u"Sanastoja voi käyttää apuna Voikon kehittämisessä.</p>")
+	indexFile.write(u"Sanastoja voi käyttää apuna Voikon kehittämisessä. <strong>Sanastoformaatti 5 toimii libvoikon version 4.0 ja uudempien kanssa.</strong></p>")
 
 def indexDict(indexFile, dict):
 	indexFile.write(u"<tr><td>Tunniste: <kbd>" + dict.variant + "</kbd><br />")
@@ -80,9 +80,9 @@ allDicts.append(d)
 d = Voikkodict()
 d.idSuffix = u"-erityis"
 d.variant = u"science"
-d.nameFi = u"suomi (matematiikan, fysiikan, kemian, lääketieteen, kasvatustieteen ja tietotekniikan sanastot)"
+d.nameFi = u"suomi (matematiikan, fysiikan, kemian, biologian, maantieteen, geologian, lääketieteen, kasvatustieteen ja tietotekniikan sanastot)"
 d.nameEn = u"Finnish (scientific vocabulary)"
-d.smOptions = u'GENLEX_OPTS="--extra-usage=it,medicine,science,education" EXTRA_LEX="vocabulary/erikoisalat/atk-lyhenteet.lex"'
+d.smOptions = u'GENLEX_OPTS="--extra-usage=it,medicine,science,nature,education" EXTRA_LEX="vocabulary/erikoisalat/atk-lyhenteet.lex"'
 allDicts.append(d)
 
 d = Voikkodict()
@@ -104,9 +104,9 @@ allDicts.append(d)
 d = Voikkodict()
 d.idSuffix = u"-laaketiede"
 d.variant = u"medicine"
-d.nameFi = u"suomi (matematiikan, fysiikan, kemian ja lääketieteen sanastot)"
+d.nameFi = u"suomi (matematiikan, fysiikan, kemian, biologian, maantieteen, geologian ja lääketieteen sanastot)"
 d.nameEn = u"Finnish (medical vocabulary)"
-d.smOptions = u'GENLEX_OPTS="--extra-usage=medicine,science"'
+d.smOptions = u'GENLEX_OPTS="--extra-usage=medicine,science,nature"'
 allDicts.append(d)
 
 d = Voikkodict()
@@ -122,7 +122,7 @@ d.idSuffix = u"-morpho"
 d.variant = u"morpho"
 d.nameFi = u"suomi, erittäin laaja sanasto (mukana myös morfologisessa analyysissä tarvittava lisäinformaatio)"
 d.nameEn = u"Finnish, very extensive vocabulary (with additional information needed in morphological analysis)"
-d.smOptions = u'GENLEX_OPTS="--extra-usage=it,science,medicine,education,orgname --style=dialect,old,international,foreign,inappropriate --min-frequency=10" EXTRA_LEX="vocabulary/erikoisalat/atk-lyhenteet.lex vocabulary/erikoisalat/linux-distributions.lex" VANHAT_MUODOT=yes VOIKKO_DEBUG=yes'
+d.smOptions = u'GENLEX_OPTS="--extra-usage=it,science,nature,medicine,education,orgname --style=dialect,old,international,foreign,inappropriate --min-frequency=10" EXTRA_LEX="vocabulary/erikoisalat/atk-lyhenteet.lex vocabulary/erikoisalat/linux-distributions.lex" VANHAT_MUODOT=yes VOIKKO_DEBUG=yes'
 allDicts.append(d)
 
 d = Voikkodict()
@@ -130,10 +130,10 @@ d.idSuffix = u"-morphoid"
 d.variant = u"morphoid"
 d.nameFi = u"suomi, erittäin laaja sanasto (mukana myös morfologisessa analyysissä tarvittava lisäinformaatio ja linkitys Joukahaiseen)"
 d.nameEn = u"Finnish, very extensive vocabulary (with additional information needed in morphological analysis and links to Joukahainen)"
-d.smOptions = u'GENLEX_OPTS="--extra-usage=it,science,medicine,education,orgname --style=dialect,old,international,foreign,inappropriate --min-frequency=10 --sourceid" EXTRA_LEX="vocabulary/erikoisalat/atk-lyhenteet.lex vocabulary/erikoisalat/linux-distributions.lex" VANHAT_MUODOT=yes VOIKKO_DEBUG=yes'
+d.smOptions = u'GENLEX_OPTS="--extra-usage=it,science,nature,medicine,education,orgname --style=dialect,old,international,foreign,inappropriate --min-frequency=10 --sourceid" EXTRA_LEX="vocabulary/erikoisalat/atk-lyhenteet.lex vocabulary/erikoisalat/linux-distributions.lex" VANHAT_MUODOT=yes VOIKKO_DEBUG=yes'
 allDicts.append(d)
 
-WORK_DIR = "build"
+WORK_DIR = "build-v5"
 
 INDEX_FILE_NAME = WORK_DIR + "/index.html"
 
@@ -150,13 +150,13 @@ DICT_DIR_PREFIX="dict"
 
 for dict in allDicts:
 	runCmd('make clean')
-	runCmd('make voikko-install DESTDIR="' + WORK_DIR + '/' + DICT_DIR_PREFIX
+	runCmd('make vvfst-install DESTDIR="' + WORK_DIR + '/' + DICT_DIR_PREFIX
 	                                       + dict.idSuffix + '" '
 	       + dict.smOptions
 	       + ' VOIKKO_VARIANT=' + dict.variant
 	       + ' VOIKKO_DESCRIPTION="' + dict.nameFi + '"'
 	       + ' SM_PATCHINFO="Development snapshot"')
-	p = Popen("grep '^[[]perusmuoto:' voikko/joukahainen.lex | wc -l",
+	p = Popen("cat vvfst/joukahainen-*.lexc | grep '^[[]' | wc -l",
 	          shell = True, stdout = PIPE, close_fds = True)
 	(out, err) = p.communicate()
 	dict.wordRecords = int(out)
@@ -166,10 +166,9 @@ for dict in allDicts:
 OXT_TEMPLATE_DIR="oxt-template"
 OXT_PACKAGE_DIR="oxt"
 DICT_FILES_TO_COPY=[
-	'voikko-fi_FI.lex_l',
-	'voikko-fi_FI.mor_l',
-	'voikko-fi_FI.sym_l',
-	'voikko-fi_FI.pro'
+	'autocorr.vfst',
+	'index.txt'
+	'mor.vfst'
 ]
 OXT_DESCRIPTION="description.xml"
 
@@ -210,10 +209,10 @@ indexFile.write(u"</table>")
 
 runCmd('make clean')
 runCmd('make dist-gzip SM_VERSION=snapshot')
-runCmd('cp suomi-malaga-snapshot.tar.gz ' + WORK_DIR)
+runCmd('cp voikko-fi-snapshot.tar.gz ' + WORK_DIR)
 runCmd('make clean SM_VERSION=snapshot')
 indexFile.write(u"<h2>Lähdekoodi</h2>")
-indexFile.write(u"<p><a href='suomi-malaga-snapshot.tar.gz'>suomi-malaga-snapshot.tar.gz</a></p>")
+indexFile.write(u"<p><a href='voikko-fi-snapshot.tar.gz'>voikko-fi-snapshot.tar.gz</a></p>")
 
 # === Finalisation ===
 

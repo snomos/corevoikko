@@ -27,6 +27,7 @@
  *********************************************************************************/
 
 #include "../fst/Transition.hpp"
+#include "../fst/WeightedTransition.hpp"
 #include <cassert>
 #include <string>
 #include <iostream>
@@ -35,6 +36,7 @@
 #include <vector>
 #include <map>
 #include <algorithm>
+#include <cmath>
 
 using namespace libvoikko::fst;
 using namespace std;
@@ -45,11 +47,15 @@ struct Symbol {
 };
 
 struct AttState {
-	vector<Transition> transitions;
+	vector<WeightedTransition> transitions;
 	vector<uint32_t> targetStateOrds;
 };
 
 static uint16_t swap(uint16_t x) {
+	return (x>>8) | (x<<8);
+}
+
+static int16_t swap(int16_t x) {
 	return (x>>8) | (x<<8);
 }
 
@@ -73,30 +79,77 @@ static uint32_t swapIf(bool doSwap, uint32_t x) {
 	return doSwap ? swap(x) : x;
 }
 
-static void writeTrans(ofstream & out, bool doSwap, Transition & t) {
-	if (doSwap) {
-		Transition tSwapped;
-		tSwapped.symIn = swap(t.symIn);
-		tSwapped.symOut = swap(t.symOut);
-		uint32_t ts = t.transInfo.targetState;
-		tSwapped.transInfo.targetState = ((ts<<16) & 0x00FF0000) | (ts & 0x0000FF00) | ((ts>>16) & 0x000000FF);
-		tSwapped.transInfo.moreTransitions = t.transInfo.moreTransitions;
-		out.write((char *) &tSwapped, sizeof(Transition));
+static int16_t probWeightToLog(double probWeight) {
+	return -log(probWeight) * 100.0; // TODO check for overflow
+}
+
+static int16_t logWeightToLog(double logWeight) {
+	return logWeight * 1000.0; // TODO check for overflow
+}
+
+static void writeTrans(ofstream & out, bool doSwap, WeightedTransition & t, bool weights) {
+	if (weights) {
+		if (doSwap) {
+			WeightedTransition tSwapped;
+			tSwapped.symIn = swap(t.symIn);
+			tSwapped.symOut = swap(t.symOut);
+			tSwapped.targetState = swap(t.targetState);
+			tSwapped.weight = swap(t.weight);
+			tSwapped.moreTransitions = t.moreTransitions;
+			tSwapped.reserved = 0;
+			out.write((char *) &tSwapped, sizeof(WeightedTransition));
+		}
+		else {
+			out.write((char *) &t, sizeof(WeightedTransition));
+		}
 	}
 	else {
-		out.write((char *) &t, sizeof(Transition));
+		Transition tu;
+		tu.symIn = t.symIn; // TODO check for overflow
+		tu.symOut = t.symOut; // TODO check for overflow
+		tu.transInfo.targetState = t.targetState; // TODO check for overflow
+		tu.transInfo.moreTransitions = t.moreTransitions;
+		if (doSwap) {
+			Transition tSwapped;
+			tSwapped.symIn = swap(tu.symIn);
+			tSwapped.symOut = swap(tu.symOut);
+			uint32_t ts = tu.transInfo.targetState;
+			tSwapped.transInfo.targetState = ((ts<<16) & 0x00FF0000) | (ts & 0x0000FF00) | ((ts>>16) & 0x000000FF);
+			tSwapped.transInfo.moreTransitions = tu.transInfo.moreTransitions;
+			out.write((char *) &tSwapped, sizeof(Transition));
+		}
+		else {
+			out.write((char *) &tu, sizeof(Transition));
+		}
 	}
 }
 
-static void writeOverflow(ofstream & out, bool doSwap, OverflowCell & oc) {
-	if (doSwap) {
-		OverflowCell ocSwapped;
-		ocSwapped.moreTransitions = swap(oc.moreTransitions);
-		ocSwapped.padding = 0;
-		out.write((char *) &ocSwapped, sizeof(OverflowCell));
+static void writeOverflow(ofstream & out, bool doSwap, WeightedOverflowCell & oc, bool weights) {
+	if (weights) {
+		if (doSwap) {
+			WeightedOverflowCell ocSwapped;
+			ocSwapped.moreTransitions = swap(oc.moreTransitions);
+			ocSwapped.shortPadding = 0;
+			ocSwapped.padding = 0;
+			out.write((char *) &ocSwapped, sizeof(WeightedOverflowCell));
+		}
+		else {
+			out.write((char *) &oc, sizeof(WeightedOverflowCell));
+		}
 	}
 	else {
-		out.write((char *) &oc, sizeof(OverflowCell));
+		OverflowCell ocu;
+		ocu.moreTransitions = oc.moreTransitions; // TODO check for overflow
+		ocu.padding = 0;
+		if (doSwap) {
+			OverflowCell ocSwapped;
+			ocSwapped.moreTransitions = swap(ocu.moreTransitions);
+			ocSwapped.padding = 0;
+			out.write((char *) &ocSwapped, sizeof(OverflowCell));
+		}
+		else {
+			out.write((char *) &ocu, sizeof(OverflowCell));
+		}
 	}
 }
 
@@ -123,15 +176,21 @@ static string convertSymbolNames(string input) {
 	if (input == "@0@") {
 		return string("");
 	}
+	else if (input == "@_SPACE_@") {
+		return string(" ");
+	}
+	else if (input == "@_IDENTITY_SYMBOL_@" || input == "@_UNKNOWN_SYMBOL_@") {
+		return string("#"); // these are not supported yet
+	}
 	return input;
 }
 
-static void setTarget(Transition & t, vector<uint32_t> & stateOrdinalToOffset, uint32_t targetStateOrdinal) {
+static void setTarget(WeightedTransition & t, vector<uint32_t> & stateOrdinalToOffset, uint32_t targetStateOrdinal) {
 	if (targetStateOrdinal >= stateOrdinalToOffset.size()) {
 		cerr << "ERROR: target state not final or source for another transition: " << targetStateOrdinal << endl;
 		exit(1);
 	}
-	t.transInfo.targetState = stateOrdinalToOffset[targetStateOrdinal];
+	t.targetState = stateOrdinalToOffset[targetStateOrdinal];
 }
 
 struct compareSymbolsForLookupOrder {
@@ -173,6 +232,8 @@ int main(int argc, char ** argv) {
 
 	string outputFile;
 	string format = "le";
+	bool weights = false;
+	int16_t(*weightFunc)(double) = 0;
 	for (int i = 1; i < argc; i++) {
 		string args(argv[i]);
 		if (args == "-o" && i + 1 < argc) {
@@ -180,6 +241,20 @@ int main(int argc, char ** argv) {
 		}
 		else if (args == "-f" && i + 1 < argc) {
 			format = string(argv[++i]);
+		}
+		else if (args == "-w" && i + 1 < argc) {
+			weights = true;
+			string weightType(argv[++i]);
+			if (weightType == "prob") {
+				weightFunc = probWeightToLog;
+			}
+			else if (weightType == "log") {
+				weightFunc = logWeightToLog;
+			}
+			else {
+				cerr << "ERROR: unknown weight type";
+				exit(1);
+			}
 		}
 	}
 
@@ -218,22 +293,68 @@ int main(int argc, char ** argv) {
 			uint32_t targetStateOrd = 0;
 			string symInStr;
 			string symOutStr;
+			string targetOrFinalWeight;
+			double weight;
+			bool finalState = false;
+			bool hasFinalWeight = false;
+
 			ss >> sourceStateOrd;
-			ss >> targetStateOrd;
-			ss >> symInStr;
-			ss >> symOutStr;
+			if (ss.eof()) {
+				finalState = true;
+			}
+			else {
+				if (weights) {
+					ss >> targetOrFinalWeight;
+					istringstream s2(targetOrFinalWeight);
+					if (ss.eof()) {
+						finalState = true;
+						hasFinalWeight = true;
+						s2 >> weight;
+					}
+					else {
+						s2 >> targetStateOrd;
+					}
+				}
+				else {
+					ss >> targetStateOrd;
+				}
+				if (!finalState) {
+					ss >> symInStr;
+					ss >> symOutStr;
+					if (ss.fail()) {
+						cerr << "ERROR: format error on input line:" << endl;
+						cerr << line << endl;
+						exit(1);
+					}
+					if (weights) {
+						if (ss.eof()) {
+							cerr << "ERROR: missing weight" << endl;
+							cerr << line << endl;
+							exit(1);
+						}
+						ss >> weight;
+						if (ss.fail()) {
+							cerr << "ERROR: unparseable weight" << endl;
+							cerr << line << endl;
+							exit(1);
+						}
+					}
+				}
+			}
 			if (attStateVector.size() < sourceStateOrd) {
 				cerr << "ERROR: invalid source state" << endl;
+				cerr << line << endl;
 				exit(1);
 			}
 			if (attStateVector.size() == sourceStateOrd) {
 				attStateVector.push_back(AttState());
 			}
-			if (line.find("\t") == string::npos) {
+			if (finalState) {
 				finalStateCount++;
-				Transition t;
-				t.symIn = 0xFFFF;
+				WeightedTransition t;
+				t.symIn = 0xFFFFFFFF;
 				t.symOut = 0;
+				t.weight = (hasFinalWeight ? weightFunc(weight) : 0);
 				attStateVector[sourceStateOrd].transitions.push_back(t);
 				attStateVector[sourceStateOrd].targetStateOrds.push_back(0);
 			}
@@ -242,9 +363,10 @@ int main(int argc, char ** argv) {
 				symOutStr = convertSymbolNames(symOutStr);
 				ensureSymbolInMap(symInStr, symVector, symMap);
 				ensureSymbolInMap(symOutStr, symVector, symMap);
-				Transition t;
+				WeightedTransition t;
 				t.symIn = symMap[symInStr].code;
 				t.symOut = symMap[symOutStr].code;
+				t.weight = (weights ? weightFunc(weight) : 0);
 				attStateVector[sourceStateOrd].transitions.push_back(t);
 				attStateVector[sourceStateOrd].targetStateOrds.push_back(targetStateOrd);
 				transitionCount++;
@@ -252,9 +374,9 @@ int main(int argc, char ** argv) {
 		}
 	}
 	
-	cerr << "Symbols: " << symVector.size() << endl;
-	cerr << "Transitions: " << transitionCount << endl;
-	cerr << "Final states: " << finalStateCount << endl;
+	cout << "Symbols: " << symVector.size() << endl;
+	cout << "Transitions: " << transitionCount << endl;
+	cout << "Final states: " << finalStateCount << endl;
 	
 	// reorder symbols for faster lookup
 	{
@@ -266,8 +388,8 @@ int main(int argc, char ** argv) {
 		}
 		sort(oldToNewSym.begin(), oldToNewSym.end());
 		for (vector<AttState>::iterator sIt = attStateVector.begin(); sIt < attStateVector.end(); ++sIt) {
-			for (vector<Transition>::iterator tIt = sIt->transitions.begin(); tIt < sIt->transitions.end(); ++tIt) {
-				if (tIt->symIn != 0xFFFF) {
+			for (vector<WeightedTransition>::iterator tIt = sIt->transitions.begin(); tIt < sIt->transitions.end(); ++tIt) {
+				if (tIt->symIn != 0xFFFFFFFF) {
 					tIt->symIn = oldToNewSym[tIt->symIn].second;
 					tIt->symOut = oldToNewSym[tIt->symOut].second;
 				}
@@ -299,7 +421,7 @@ int main(int argc, char ** argv) {
 		}
 	}
 	// TODO check that currentOffset is not too large
-	cerr << "Overflow cells: " << overflowCells << endl;
+	cout << "Overflow cells: " << overflowCells << endl;
 	
 	ofstream transducerFile(outputFile.c_str(), ios::out | ios::binary);
 	
@@ -309,8 +431,10 @@ int main(int argc, char ** argv) {
 	const uint32_t COOKIE2 = swapIf(byteSwap, (uint32_t)0x000351FA);
 	transducerFile.write((char *)&COOKIE1, sizeof(uint32_t));
 	transducerFile.write((char *)&COOKIE2, sizeof(uint32_t));
-	// 8 bytes of reserved space for future format extensions and variants. Must be zero for now.
-	transducerFile.seekp(8, ios_base::cur);
+	// Do we have weights? 0x00 == unweighted, 0x01 == weighted
+	transducerFile.put(weights ? 0x01 : 0x00);
+	// 7 bytes of reserved space for future format extensions and variants. Must be zero for now.
+	transducerFile.seekp(7, ios_base::cur);
 	
 	// Write symbols
 	uint16_t symbolCount = symVector.size();
@@ -321,11 +445,12 @@ int main(int argc, char ** argv) {
 		transducerFile.put(0);
 	}
 	
-	// Write padding so that transition table starts at 8 byte boundary
+	// Write padding so that transition table starts at 8/16 byte boundary
 	{
-		size_t partial = transducerFile.tellp() % sizeof(Transition);
+		size_t transitionSize = weights ? sizeof(WeightedTransition) : sizeof(Transition);
+		size_t partial = transducerFile.tellp() % transitionSize;
 		if (partial > 0) {
-			transducerFile.seekp(sizeof(Transition) - partial, ios_base::cur);
+			transducerFile.seekp(transitionSize - partial, ios_base::cur);
 		}
 	}
 	
@@ -333,22 +458,23 @@ int main(int argc, char ** argv) {
 	for (vector<AttState>::iterator it = attStateVector.begin(); it < attStateVector.end(); it++) {
 		uint32_t tCount = it->transitions.size();
 		{
-			Transition & t = it->transitions[0];
+			WeightedTransition & t = it->transitions[0];
 			setTarget(t, stateOrdinalToOffset, it->targetStateOrds[0]);
-			t.transInfo.moreTransitions = (tCount > 255 ? 255 : tCount - 1);
-			writeTrans(transducerFile, byteSwap, t);
+			t.moreTransitions = (tCount > 255 ? 255 : tCount - 1);
+			writeTrans(transducerFile, byteSwap, t, weights);
 		}
 		if (tCount > 255) {
-			OverflowCell oc;
+			WeightedOverflowCell oc;
 			oc.moreTransitions = tCount - 1;
+			oc.shortPadding = 0;
 			oc.padding = 0;
-			writeOverflow(transducerFile, byteSwap, oc);
+			writeOverflow(transducerFile, byteSwap, oc, weights);
 		}
 		for (uint32_t ti = 1; ti < tCount; ti++) {
-			Transition & t = it->transitions[ti];
+			WeightedTransition & t = it->transitions[ti];
 			setTarget(t, stateOrdinalToOffset, it->targetStateOrds[ti]);
-			t.transInfo.moreTransitions = 0;
-			writeTrans(transducerFile, byteSwap, t);
+			t.moreTransitions = 0;
+			writeTrans(transducerFile, byteSwap, t, weights);
 		}
 	}
 	

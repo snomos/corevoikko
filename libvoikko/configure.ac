@@ -28,7 +28,10 @@
 
 dnl General options for autoconf
 AC_PREREQ(2.60)
-AC_INIT([libvoikko],[3.7.1],[hatapitk@iki.fi])
+AC_INIT([libvoikko],[4.0],[hatapitk@iki.fi])
+
+LT_PREREQ([2.2.6])
+
 AC_CONFIG_HEADERS(config.h)
 AM_INIT_AUTOMAKE([1.10 foreign])
 AC_CONFIG_MACRO_DIR([m4])
@@ -36,11 +39,11 @@ AC_CONFIG_MACRO_DIR([m4])
 dnl Checks for programs
 AC_PROG_CXX
 AC_PROG_INSTALL
-AM_PATH_PYTHON
+AM_PATH_PYTHON([3])
 
 dnl Libtool (new and old)
 AC_LIBTOOL_WIN32_DLL
-ifdef([LT_INIT], [LT_INIT], [AC_PROG_LIBTOOL])
+LT_INIT
 
 AM_MAINTAINER_MODE
 
@@ -51,22 +54,8 @@ AC_C_CONST
 # Prepare platform specific setups (sets $host_os a.o.):
 AC_CANONICAL_HOST
 
-# FIXME: the following is wrong (it should be possible to change this when running make)
-if test ${prefix} = "NONE"
-then
-    case $host_os in
-      darwin* )
-        # Add /Library/Spelling/voikko when on macosx:
-        DICTIONARY_PATH=${ac_default_prefix}/lib/voikko:/Library/Spelling/voikko
-        ;;
-      *)
-        #Default Case
-        DICTIONARY_PATH=${ac_default_prefix}/lib/voikko
-        ;;
-    esac
-else
-	DICTIONARY_PATH=${prefix}/lib/voikko
-fi
+# The default dictionary path is empty (no default locations to search from)
+DICTIONARY_PATH=
 AC_ARG_WITH(dictionary-path,
             AC_HELP_STRING([--with-dictionary-path=PATH],
 	                   [Dictionary path]),
@@ -109,10 +98,10 @@ AC_COMPILE_IFELSE([AC_LANG_SOURCE(
 ])
 
 dnl Build tools
-buildtools="no"
-AC_ARG_ENABLE(buildtools, AC_HELP_STRING([--enable-buildtools],
-        [enable voikkovfstc (EXPERIMENTAL!)]),
-        [buildtools=${enableval}], [buildtools=no])
+buildtools="yes"
+AC_ARG_ENABLE(buildtools, AC_HELP_STRING([--disable-buildtools],
+        [disable voikkovfstc]),
+        [buildtools=${enableval}], [buildtools=yes])
 AM_CONDITIONAL([HAVE_BUILDTOOLS], [test x$buildtools = xyes])
 
 dnl Test tools
@@ -123,21 +112,22 @@ AC_ARG_ENABLE(testtools, AC_HELP_STRING([--disable-testtools],
 AM_CONDITIONAL([HAVE_TESTTOOLS], [test x$testtools = xyes])
 	
 dnl Malaga support
-malaga="yes"
+malaga="no"
 AH_TEMPLATE(HAVE_MALAGA, [Have MALAGA])
-AC_ARG_ENABLE(malaga, AC_HELP_STRING([--disable-malaga],
-	[disable Malaga morphology backend (EXPERIMENTAL!)]),
-	[malaga=${enableval}], [malaga=yes])
+AC_ARG_ENABLE(malaga, AC_HELP_STRING([--enable-malaga],
+	[enable Malaga morphology backend (dictionary version 2)]),
+	[malaga=${enableval}], [malaga=no])
 if test x$malaga = xyes; then
 	AC_DEFINE(HAVE_MALAGA, 1)
 fi
 AM_CONDITIONAL([HAVE_MALAGA], [test x$malaga = xyes])
 
 dnl HFST support
+hfst="yes"
 AH_TEMPLATE(HAVE_HFST, [Have HFST])
-AC_ARG_ENABLE(hfst, AC_HELP_STRING([--enable-hfst],
-	[enable HFST morphology backend]),
-	[hfst=${enableval}], [hfst=no])
+AC_ARG_ENABLE(hfst, AC_HELP_STRING([--disable-hfst],
+	[disable HFST morphology backend]),
+	[hfst=${enableval}], [hfst=yes])
 dnl must be AS_IF for some aclocals to pick PKG_CHECK_MODULES somehow.
 dnl AC_PROVIDE_IFELSE doesn't work on mac?
 AS_IF([test x$hfst = xyes], [
@@ -155,23 +145,36 @@ AC_ARG_ENABLE(vislcg3, AC_HELP_STRING([--enable-vislcg3],
 dnl must be AS_IF for some aclocals to pick PKG_CHECK_MODULES somehow.
 dnl AC_PROVIDE_IFELSE doesn't work on mac?
 AS_IF([test x$cg3 = xyes], [
-      PKG_CHECK_MODULES([VISLCG3], [cg3 >= 0.9])
-	  AC_DEFINE(HAVE_VISLCG3, 1)
-	  CXXFLAGS="$CXXFLAGS $VISLCG3_CFLAGS"
+	PKG_CHECK_MODULES([VISLCG3], [cg3 >= 0.9])
+	AC_CHECK_HEADERS([tinyxml2.h],,[AC_MSG_ERROR([tinyxml2.h not found])])
+	AC_DEFINE(HAVE_VISLCG3, 1)
+	CXXFLAGS="$CXXFLAGS $VISLCG3_CFLAGS"
 	])
-dnl this does not work as it should AC_CHECK_HEADER([tinyxml2.h], AC_DEFINE(HAVE_VISLCG3, 1), AC_DEFINE(HAVE_VISLCG3, 0))
 AM_CONDITIONAL([HAVE_VISLCG3], [test x$cg3 = xyes])
 
 
 dnl VFST support
+vfst="yes"
 AH_TEMPLATE(HAVE_VFST, [Have VFST])
-AC_ARG_ENABLE(vfst, AC_HELP_STRING([--enable-vfst],
-	[enable VFST morphology backend (EXPERIMENTAL!)]),
-	[vfst=${enableval}], [vfst=no])
+AC_ARG_ENABLE(vfst, AC_HELP_STRING([--disable-vfst],
+	[disable VFST morphology backend]),
+	[vfst=${enableval}], [vfst=yes])
 if test x$vfst = xyes; then
 	AC_DEFINE(HAVE_VFST, 1)
 fi
 AM_CONDITIONAL([HAVE_VFST], [test x$vfst = xyes])
+
+
+dnl support for experimental parts of VFST format
+expvfst="no"
+AH_TEMPLATE(HAVE_EXPERIMENTAL_VFST, [Have experimental VFST])
+AC_ARG_ENABLE(expvfst, AC_HELP_STRING([--enable-expvfst],
+	[enable EXPERIMENTAL features of VFST morphology backend]),
+	[expvfst=${enableval}], [expvfst=no])
+if test x$expvfst = xyes; then
+	AC_DEFINE(HAVE_EXPERIMENTAL_VFST, 1)
+fi
+AM_CONDITIONAL([HAVE_EXPERIMENTAL_VFST], [test x$expvfst = xyes])
 
 dnl Lttoolbox support
 AH_TEMPLATE(HAVE_LTTOOLBOX, [Have Lttoolbox])
@@ -202,7 +205,7 @@ if test x$build_os == xmingw32; then
 fi
 AC_SUBST(LIBLDFLAGSWIN)
 
-ACX_PTHREAD([AM_CONDITIONAL([HAVE_PTHREAD],[true])], [AM_CONDITIONAL([HAVE_PTHREAD],[false])])
+AX_PTHREAD([AM_CONDITIONAL([HAVE_PTHREAD],[true])], [AM_CONDITIONAL([HAVE_PTHREAD],[false])])
 
 dnl Functions
 AC_FUNC_MALLOC
@@ -220,3 +223,16 @@ CXXFLAGS="$CXXFLAGS -Wall -Werror -pedantic"
 
 AC_CONFIG_FILES([Makefile src/Makefile src/tools/Makefile java/Makefile msvc/Makefile test/Makefile cs/Makefile cl/Makefile src/libvoikko.pc])
 AC_OUTPUT
+
+cat <<EOF
+
+Libvoikko was configured with the following options
+  * VFST support:                   $vfst
+  *   Experimental VFST features:   $expvfst
+  * HFST support:                   $hfst
+  * Malaga support:                 $malaga
+  * Experimental VISLCG3 support:   $cg3
+  * Experimental Lttoolbox support: $lttoolbox
+  * Morphology compilers:           $buildtools
+  * Simple client programs:         $testtools
+EOF

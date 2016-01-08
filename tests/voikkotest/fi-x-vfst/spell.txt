@@ -286,7 +286,7 @@ Ab:ltä
 !esim.:ssä
 §:ssä
 DVD:nsä
-DVD:än
+DVD:ään
 !tee-n.
 
 # = sijamuodot =
@@ -468,6 +468,9 @@ paisuvaiskudoksen
 !eläväarkisto
 suurinopeuksinen # adjektiivi + adjektiivista johdettu substantiivin inen-johdos
 !nopeuksinen
+linjaerimielisyys
+tarve-erimielisyys
+vaatimustenmukaisuus
 
 # = etuliitteet =
 []
@@ -881,6 +884,9 @@ parfait'llinen # Kotus 22
 -parfait'inen # Kotus 22
 show'kin # Kotus 22
 !showkin # Kotus 22
+glasgow'lainen # Kotus 22
+!glasgowlainen # Kotus 22
+!glasgowilainen # Kotus 22
 lohien # Kotus 23
 !lohten # Kotus 23
 tuohimainen # Kotus 23
@@ -1481,7 +1487,9 @@ Pitkäsen-Pokkisen
 Pitkäs-Pokkinen
 Ford-Lada
 !Cayon
-Cayyn
+!Cayyn
+sprayhin
+sprayhyn
 kylmemmällä
 varmempaa
 vertahyytävämmässä
@@ -3393,7 +3401,7 @@ luovempia
 !jälkimäinen
 Nieminen-Mäkynen
 IV:ttä
-II:en
+!2:en
 CD:itä
 DVD:istä
 I:hin
@@ -3683,6 +3691,26 @@ kellanvalkoinen
 !pestäkää
 !kertaistan
 !kolmenaisyyspuolue
+!xl-
+Bogotáhan
+!mä
+liikkumisvapauden
+!buuatulleen
+seisty
+seisköön
+monijuonisen
+juonimainen
+niemimäinen
+pitäkääkin
+kaukokäyttöinen
+paukkajalaisia
+eritiheyksinen
+rokokoohon
+n-alkuinen
+!hallintopitäjäään
+hallintopitäjänsä
+oboeiden
+EU-johtoinen
 
 # = poikkeavat asetukset =
 

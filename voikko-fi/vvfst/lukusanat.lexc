@@ -1,0 +1,483 @@
+! Voikko-fi, suomen kielen muoto-opin kuvaus.
+!
+! Tekijänoikeus © 2006 - 2015 Hannu Väisänen (Etunimi.Sukunimi@joensuu.fi)
+!                 2006 - 2015 Harri Pitkänen (hatapitk@iki.fi)
+!
+! This program is free software; you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation; either version 2, or (at your option)
+! any later version.
+!
+! This program is distributed in the hope that it will be useful, but
+! WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+! General Public License for more details.
+!
+! You should have received a copy of the GNU General Public License
+! along with this program; see the file COPYING.  If not, write to the
+! Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+! 02110-1301, USA.
+
+LEXICON LukusananAlku
+Lukusana	;
+Järjestysluku	;
+Erikoisluku	;
+NumeromerkinAlku	;
+@D.YS_ALKANUT@:@D.YS_ALKANUT@	RoomalainenNumero	;
+
+LEXICON LukusananAlkuKerroin
+LukusanaSgNy29Alut	;
+LukusanaSpNy29Alut	;
+LukusanaStrNy29Alut	;
+LukusanaSesNy29Alut	;
+LukusanaSineNy29Alut	;
+LukusanaSelaNy29Alut	;
+LukusanaSillNy29Alut	;
+LukusanaSadeNy29Alut	;
+LukusanaSablNy29Alut	;
+LukusanaSallNy29Alut	;
+LukusanaSabNy29Alut	;
+LukusanaSgNm29Alut	;
+LukusanaSpNm29Alut	;
+LukusanaStrNm29Alut	;
+LukusanaSesNm29Alut	;
+LukusanaSineNm29Alut	;
+LukusanaSelaNm29Alut	;
+LukusanaSillNm29Alut	;
+LukusanaSadeNm29Alut	;
+LukusanaSablNm29Alut	;
+LukusanaSallNm29Alut	;
+LukusanaSabNm29Alut	;
+LukusanaSinNm29Alut	;
+LukusanaSkoNm29Alut	;
+LukusanaSstiNy29Alut	;
+[Sn][Ny][Xp]kymmenen[X]kymmenen@U.LS.SNNY@:kymmenen@U.LS.SNNY@	Liitesana_ä	;
+[Sn][Nm][Xp]kymmenen[X]kymmenet@U.LS.SNNM@:kymmenet@U.LS.SNNM@	Liitesana_ä	;
+[Sn][Ny][Xp]sata[X]sata@U.LS.SNNY@:sata@U.LS.SNNY@	LukusanaSnNy29_a	;
+[Sn][Ny][Xp]sata[X]sata@U.LS.SNNY@:sata@U.LS.SNNY@	LukusanaYksiYhdeksän	;
+[Sn][Nm][Xp]sata[X]sadat@U.LS.SNNM@:sadat@U.LS.SNNM@	LukusanaLiitesana_a	;
+[Sn][Ny][Xp]tuhat[X]tuhat@U.LS.SNNY@:tuhat@U.LS.SNNY@	LukusanaLiitesana_a	;
+[Sn][Nm][Xp]tuhat[X]tuhannet@U.LS.SNNM@:tuhannet@U.LS.SNNM@	LukusanaLiitesana_a	;
+[Sn][Ny][Xp]miljoona[X]miljoona@U.LS.SNNY@:miljoona@U.LS.SNNY@	LukusanaLiitesana_a	;
+[Sn][Nm][Xp]miljoona[X]miljoonat@U.LS.SNNM@:miljoonat@U.LS.SNNM@	LukusanaLiitesana_a	;
+[Sn][Ny][Xp]miljardi[X]miljardi@U.LS.SNNY@:miljardi@U.LS.SNNY@	LukusanaLiitesana_a	;
+[Sn][Nm][Xp]miljardi[X]miljardit@U.LS.SNNM@:miljardit@U.LS.SNNM@	LukusanaLiitesana_a	;
+[Sn][Ny][Xp]biljoona[X]biljoona@U.LS.SNNY@:biljoona@U.LS.SNNY@	LukusanaLiitesana_a	;
+[Sn][Ny][Xp]biljoona[X]biljoonat@U.LS.SNNM@:biljoonat@U.LS.SNNM@	LukusanaLiitesana_a	;
+[Sn][Ny][Xp]triljoona[X]triljoona@U.LS.SNNY@:triljoona@U.LS.SNNY@	LukusanaLiitesana_a	;
+[Sn][Ny][Xp]triljoona[X]triljoonat@U.LS.SNNM@:triljoonat@U.LS.SNNM@	LukusanaLiitesana_a	;
+[Sn][Ny][Xp]kvadriljoona[X]kvadriljoona@U.LS.SNNY@:kvadriljoona@U.LS.SNNY@	LukusanaLiitesana_a	;
+[Sn][Ny][Xp]kvadriljoona[X]kvadriljoonat@U.LS.SNNM@:kvadriljoonat@U.LS.SNNM@	LukusanaLiitesana_a	;
+[Sn][Ny][Xp]kvintiljoona[X]kvintiljoona@U.LS.SNNY@:kvintiljoona@U.LS.SNNY@	LukusanaLiitesana_a	;
+[Sn][Ny][Xp]kvintiljoona[X]kvintiljoonat@U.LS.SNNM@:kvintiljoonat@U.LS.SNNM@	LukusanaLiitesana_a	;
+[Sn][Ny][Xp]sekstiljoona[X]sekstiljoona@U.LS.SNNY@:sekstiljoona@U.LS.SNNY@	LukusanaLiitesana_a	;
+[Sn][Ny][Xp]sekstiljoona[X]sekstiljoonat@U.LS.SNNM@:sekstiljoonat@U.LS.SNNM@	LukusanaLiitesana_a	;
+[Sn][Ny][Xp]septiljoona[X]septiljoona@U.LS.SNNY@:septiljoona@U.LS.SNNY@	LukusanaLiitesana_a	;
+[Sn][Ny][Xp]septiljoona[X]septiljoonat@U.LS.SNNM@:septiljoonat@U.LS.SNNM@	LukusanaLiitesana_a	;
+[Sn][Ny][Xp]sentiljoona[X]sentiljoona@U.LS.SNNY@:sentiljoona@U.LS.SNNY@	LukusanaLiitesana_a	;
+[Sn][Ny][Xp]sentiljoona[X]sentiljoonat@U.LS.SNNM@:sentiljoonat@U.LS.SNNM@	LukusanaLiitesana_a	;
+
+LEXICON LukusananJatkoKerroin
+LukusanaSgNy29Kertoimet	;
+LukusanaSpNy29Kertoimet	;
+LukusanaStrNy29Kertoimet	;
+LukusanaSesNy29Kertoimet	;
+LukusanaSineNy29Kertoimet	;
+LukusanaSelaNy29Kertoimet	;
+LukusanaSillNy29Kertoimet	;
+LukusanaSadeNy29Kertoimet	;
+LukusanaSablNy29Kertoimet	;
+LukusanaSallNy29Kertoimet	;
+LukusanaSabNy29Kertoimet	;
+LukusanaSgNm29Kertoimet	;
+LukusanaSpNm29Kertoimet	;
+LukusanaStrNm29Kertoimet	;
+LukusanaSesNm29Kertoimet	;
+LukusanaSineNm29Kertoimet	;
+LukusanaSelaNm29Kertoimet	;
+LukusanaSillNm29Kertoimet	;
+LukusanaSadeNm29Kertoimet	;
+LukusanaSablNm29Kertoimet	;
+LukusanaSallNm29Kertoimet	;
+LukusanaSabNm29Kertoimet	;
+LukusanaSinNm29Kertoimet	;
+LukusanaSkoNm29Kertoimet	;
+LukusanaSstiNy29Kertoimet	;
+[Sn][Ny][Xp]kymmentä[X]kymmenen@U.LS.SNNY@:kymmenen@U.LS.SNNY@	Liitesana_ä	;
+[Sn][Nm][Xp]kymmentä[X]kymmenet@U.LS.SNNM@:kymmenet@U.LS.SNNM@	Liitesana_ä	;
+[Sn][Ny][Xp]sataa[X]sata@U.LS.SNNY@:sata@U.LS.SNNY@	LukusanaSnNy29_a	;
+[Sn][Ny][Xp]sataa[X]sata@U.LS.SNNY@:sata@U.LS.SNNY@	LukusanaYksiYhdeksän	;
+[Sn][Nm][Xp]sataa[X]sadat@U.LS.SNNM@:sadat@U.LS.SNNM@	LukusanaLiitesana_a	;
+[Sn][Ny][Xp]tuhatta[X]tuhat@U.LS.SNNY@:tuhat@U.LS.SNNY@	LukusanaLiitesana_a	;
+[Sn][Nm][Xp]tuhatta[X]tuhannet@U.LS.SNNM@:tuhannet@U.LS.SNNM@	LukusanaLiitesana_a	;
+[Sn][Ny][Xp]miljoonaa[X]miljoona@U.LS.SNNY@:miljoona@U.LS.SNNY@	LukusanaLiitesana_a	;
+[Sn][Nm][Xp]miljoonaa[X]miljoonat@U.LS.SNNM@:miljoonat@U.LS.SNNM@	LukusanaLiitesana_a	;
+[Sn][Ny][Xp]miljardia[X]miljardi@U.LS.SNNY@:miljardi@U.LS.SNNY@	LukusanaLiitesana_a	;
+[Sn][Nm][Xp]miljardia[X]miljardit@U.LS.SNNM@:miljardit@U.LS.SNNM@	LukusanaLiitesana_a	;
+[Sn][Ny][Xp]biljoonaa[X]biljoona@U.LS.SNNY@:biljoona@U.LS.SNNY@	LukusanaLiitesana_a	;
+[Sn][Ny][Xp]biljoonaa[X]biljoonat@U.LS.SNNM@:biljoonat@U.LS.SNNM@	LukusanaLiitesana_a	;
+[Sn][Ny][Xp]triljoonaa[X]triljoona@U.LS.SNNY@:triljoona@U.LS.SNNY@	LukusanaLiitesana_a	;
+[Sn][Ny][Xp]triljoonaa[X]triljoonat@U.LS.SNNM@:triljoonat@U.LS.SNNM@	LukusanaLiitesana_a	;
+[Sn][Ny][Xp]kvadriljoonaa[X]kvadriljoona@U.LS.SNNY@:kvadriljoona@U.LS.SNNY@	LukusanaLiitesana_a	;
+[Sn][Ny][Xp]kvadriljoonaa[X]kvadriljoonat@U.LS.SNNM@:kvadriljoonat@U.LS.SNNM@	LukusanaLiitesana_a	;
+[Sn][Ny][Xp]kvintiljoonaa[X]kvintiljoona@U.LS.SNNY@:kvintiljoona@U.LS.SNNY@	LukusanaLiitesana_a	;
+[Sn][Ny][Xp]kvintiljoonaa[X]kvintiljoonat@U.LS.SNNM@:kvintiljoonat@U.LS.SNNM@	LukusanaLiitesana_a	;
+[Sn][Ny][Xp]sekstiljoonaa[X]sekstiljoona@U.LS.SNNY@:sekstiljoona@U.LS.SNNY@	LukusanaLiitesana_a	;
+[Sn][Ny][Xp]sekstiljoonaa[X]sekstiljoonat@U.LS.SNNM@:sekstiljoonat@U.LS.SNNM@	LukusanaLiitesana_a	;
+[Sn][Ny][Xp]septiljoonaa[X]septiljoona@U.LS.SNNY@:septiljoona@U.LS.SNNY@	LukusanaLiitesana_a	;
+[Sn][Ny][Xp]septiljoonaa[X]septiljoonat@U.LS.SNNM@:septiljoonat@U.LS.SNNM@	LukusanaLiitesana_a	;
+[Sn][Ny][Xp]sentiljoonaa[X]sentiljoona@U.LS.SNNY@:sentiljoona@U.LS.SNNY@	LukusanaLiitesana_a	;
+[Sn][Ny][Xp]sentiljoonaa[X]sentiljoonat@U.LS.SNNM@:sentiljoonat@U.LS.SNNM@	LukusanaLiitesana_a	;
+
+LEXICON Lukusana
+LukusanaYksiYhdeksän	;
+[Lu]:	LukusananAlkuKerroin	;
+
+LEXICON LukusanaYksiYhdeksän
+[Lu][Xp]yksi[X]y:y	LukusanaYksi_ä	;
+[Lu][Xp]kaksi[X]ka:ka	LukusanaKaksi_a	;
+[Lu][Xp]kolme[X]kolm:kolm	LukusanaKolme_a	;
+[Lu][Xp]neljä[X]nelj:nelj	LukusanaNeljä_ä	;
+[Lu][Xp]viisi[X]vii:vii	LukusanaViisi_ä	;
+[Lu][Xp]kuusi[X]kuu:kuu	LukusanaViisi_a	;
+[Lu][Xp]seitsemän[X]seitsem:seitsem	LukusanaSeitsemän_ä	;
+[Lu][Xp]kahdeksan[X]kahdeks:kahdeks	LukusanaSeitsemän_a	;
+[Lu][Xp]yhdeksän[X]yhdeks:yhdeks	LukusanaSeitsemän_ä	;
+
+LEXICON JärjestysluvunAlkuKerroin
+JärjestyslukuSgNy39Kertoimet	;
+JärjestyslukuSpNy39Kertoimet	;
+JärjestyslukuStrNy39Kertoimet	;
+JärjestyslukuSesNy39Kertoimet	;
+JärjestyslukuSineNy39Kertoimet	;
+JärjestyslukuSelaNy39Kertoimet	;
+JärjestyslukuSillNy39Kertoimet	;
+JärjestyslukuSadeNy39Kertoimet	;
+JärjestyslukuSablNy39Kertoimet	;
+JärjestyslukuSallNy39Kertoimet	;
+JärjestyslukuSabNy39Kertoimet	;
+JärjestyslukuSgNm39Kertoimet	;
+JärjestyslukuSpNm39Kertoimet	;
+JärjestyslukuStrNm39Kertoimet	;
+JärjestyslukuSesNm39Kertoimet	;
+JärjestyslukuSineNm39Kertoimet	;
+JärjestyslukuSelaNm39Kertoimet	;
+JärjestyslukuSillNm39Kertoimet	;
+JärjestyslukuSadeNm39Kertoimet	;
+JärjestyslukuSablNm39Kertoimet	;
+JärjestyslukuSallNm39Kertoimet	;
+JärjestyslukuSabNm39Kertoimet	;
+JärjestyslukuSinNm39Kertoimet	;
+JärjestyslukuSkoNm39Kertoimet	;
+[Sn][Ny][Xp]kymmenes[X]kymmenes@U.LS.SNNY@:kymmenes@U.LS.SNNY@	JärjestyslukuLiitesanaJl_ä	;
+[Sn][Nm][Xp]kymmenes[X]kymmenennet@U.LS.SNNM@:kymmenennet@U.LS.SNNM@	JärjestyslukuLiitesanaJl_ä	;
+[Sn][Ny][Xp]sadas[X]sadas@U.LS.SNNY@:sadas@U.LS.SNNY@	JärjestyslukuLiitesanaJl_a	;
+[Sn][Ny][Xp]tuhannes[X]tuhannes@U.LS.SNNY@:tuhannes@U.LS.SNNY@	JärjestyslukuLiitesanaJl_a	;
+[Sn][Ny][Xp]miljoonas[X]miljoonas@U.LS.SNNY@:miljoonas@U.LS.SNNY@	JärjestyslukuLiitesanaJl_a	;
+[Sn][Ny][Xp]miljardis[X]miljardis@U.LS.SNNY@:miljardis@U.LS.SNNY@	JärjestyslukuLiitesanaJl_a	;
+
+LEXICON Järjestysluku
+[Lu][Xp]ensimmäinen[X]ensimmäi:ensimmäi	JärjestyslukuNainen_ä	;
+[Lu][Xp]yhdes[X]yhde:yhde	JärjestyslukuKahdeksas_ä	;
+[Lu][Xp]toinen[X]toi:toi	JärjestyslukuNainen_a	;
+[Lu][Xp]kahdes[X]kahde:kahde	JärjestyslukuKahdeksas_a	;
+[Lu][Xp]kolmas[X]kolma:kolma	JärjestyslukuKahdeksas_a	;
+[Lu][Xp]neljäs[X]neljä:neljä	JärjestyslukuKahdeksas_ä	;
+[Lu][Xp]viides[X]viide:viide	JärjestyslukuKahdeksas_ä	;
+[Lu][Xp]kuudes[X]kuude:kuude	JärjestyslukuKahdeksas_a	;
+[Lu][Xp]seitsemäs[X]seitsemä:seitsemä	JärjestyslukuKahdeksas_ä	;
+[Lu][Xp]kahdeksas[X]kahdeksa:kahdeksa	JärjestyslukuKahdeksas_a	;
+[Lu][Xp]yhdeksäs[X]yhdeksä:yhdeksä	JärjestyslukuKahdeksas_ä	;
+[Lu]:	JärjestysluvunAlkuKerroin	;
+
+LEXICON Erikoisluku
+[Lu][Xp]kolmi[X]kolmi:kolmi	LukusananErikoisjälkiliite	;
+[Lu][Xp]neli[X]neli:neli	LukusananErikoisjälkiliite	;
+[Lu][Xp]seitsen[X]seitsen:seitsen	LukusananErikoisjälkiliite	;
+[Lu][Xp]kymmen[X]kymmen:kymmen	LukusananErikoisjälkiliite	;
+[Lu][Xp]kaksikymmen[X]kaksi[Bm]kymmen:kaksikymmen	LukusananErikoisjälkiliite	;
+[Lu][Xp]kolmikymmen[X]kolmi[Bm]kymmen:kolmikymmen	LukusananErikoisjälkiliite	;
+[Lu][Xp]nelikymmen[X]neli[Bm]kymmen:nelikymmen	LukusananErikoisjälkiliite	;
+[Lu][Xp]viisikymmen[X]viisi[Bm]kymmen:viisikymmen	LukusananErikoisjälkiliite	;
+[Lu][Xp]kuusikymmen[X]kuusi[Bm]kymmen:kuusikymmen	LukusananErikoisjälkiliite	;
+[Lu][Xp]seitsenkymmen[X]seitsen[Bm]kymmen:seitsenkymmen	LukusananErikoisjälkiliite	;
+[Lu][Xp]kahdeksankymmen[X]kahdeksan[Bm]kymmen:kahdeksankymmen	LukusananErikoisjälkiliite	;
+[Lu][Xp]yhdeksänkymmen[X]yhdeksän[Bm]kymmen:yhdeksänkymmen	LukusananErikoisjälkiliite	;
+[Lu][Xp]puolitoista[X]puoli[Bm]toista:puolitoista	Liitesana_a	;
+[Lu][Xp]puolitoista[X]puolen[Bm]toista:puolentoista	Liitesana_a	;
+[Lu][Xp]puolitoista[X]puolta[Bm]toista:puoltatoista	Liitesana_a	;
+[Lu][Xp]puolitoista[X]puolena[Bm]toista:puolenatoista	Liitesana_a	;
+[Lu][Xp]puolitoista[X]puoleksi[Bm]toista:puoleksitoista	Liitesana_a	;
+[Lu][Xp]puolitoista[X]puolessa[Bm]toista:puolessatoista	Liitesana_a	;
+[Lu][Xp]puolitoista[X]puolesta[Bm]toista:puolestatoista	Liitesana_a	;
+[Lu][Xp]puolitoista[X]puoleen[Bm]toista:puoleentoista	Liitesana_a	;
+[Lu][Xp]puolitoista[X]puolelta[Bm]toista:puoleltatoista	Liitesana_a	;
+[Lu][Xp]puolitoista[X]puolella[Bm]toista:puolellatoista	Liitesana_a	;
+[Lu][Xp]puolitoista[X]puolelle[Bm]toista:puolelletoista	Liitesana_a	;
+[Lu][Xp]puolitoista[X]puoletta[Bm]toista:puolettatoista	Liitesana_a	;
+[Lu][Xp]puolitoista[X]puolisen[Bm]toista:puolisentoista	Liitesana_a	;
+[Lu][Xp]parisen[X]parisen:parisen	ParisenKymmentä	;
+[Lu][Xp]kolmisen[X]kolmisen:kolmisen	XKymmentä_a	;
+[Lu][Xp]nelisen[X]nelisen:nelisen	XKymmentä_ä	;
+[Lu][Xp]viitisen[X]viitisen:viitisen	XKymmentä_ä	;
+[Lu][Xp]kuutisen[X]kuutisen:kuutisen	XKymmentä_a	;
+[Lu][Xp]seitsemisen[X]seitsemisen:seitsemisen	XKymmentä_ä	;
+[Lu][Xp]kahdeksisen[X]kahdeksisen:kahdeksisen	XKymmentä_a	;
+[Lu][Xp]yhdeksisen[X]yhdeksisen:yhdeksisen	XKymmentä_ä	;
+[Lu][Xp]kymmenisen[X]kymmenisen:kymmenisen	Liitesana_ä	;
+[Lu][Xp]toista[X]toista:toista	XKymmentäEiLiitesana	;
+[Lu][Xp]kolmatta[X]kolmatta:kolmatta	XKymmentäEiLiitesana	;
+[Lu][Xp]neljättä[X]neljättä:neljättä	XKymmentäEiLiitesana	;
+[Lu][Xp]viidettä[X]viidettä:viidettä	XKymmentäEiLiitesana	;
+[Lu][Xp]kuudetta[X]kuudetta:kuudetta	XKymmentäEiLiitesana	;
+[Lu][Xp]seitsemättä[X]seitsemättä:seitsemättä	XKymmentäEiLiitesana	;
+[Lu][Xp]kahdeksatta[X]kahdeksatta:kahdeksatta	XKymmentäEiLiitesana	;
+[Lu][Xp]yhdeksättä[X]yhdeksättä:yhdeksättä	XKymmentäEiLiitesana	;
+
+LEXICON ParisenKymmentä
+[Bc][Sn][Ny][Xp]kymmentä[X]kymmentä:kymmentä	Loppu	;
+[Bc][Sn][Ny][Xp]sataa[X]sataa:sataa	Loppu	;
+
+LEXICON XKymmentäEiLiitesana
+[Bc][Lu][Sn][Ny][Xp]kymmentä[X]kymmentä:kymmentä	Liitesana_ä	;
+[Bc][Lu][Sn][Ny][Xp]sataa[X]sataa:sataa	Liitesana_a	;
+[Bc][Lu][Sn][Ny][Xp]tuhatta[X]tuhatta:tuhatta	Liitesana_a	;
+
+LEXICON LukusanaKymmentäSnNy
+[Bc]kymmentä:kymmentä	LukusanaLiitesana_ä	;
+[Bc]sataa:sataa	LukusanaLiitesana_a	;
+LukusanaKerroinTuhatta	;
+
+LEXICON LukusanaKerroinTuhatta
+[Bc]tuhatta:tuhatta	LukusanaLiitesana_a	;
+[Bc]miljoonaa:miljoonaa	LukusanaLiitesana_a	;
+[Bc]miljardia:miljardia	LukusanaLiitesana_a	;
+[Bc]triljoonaa:triljoonaa	LukusanaLiitesana_a	;
+[Bc]kvadriljoonaa:kvadriljoonaa	LukusanaLiitesana_a	;
+[Bc]kvintiljoonaa:kvintiljoonaa	LukusanaLiitesana_a	;
+[Bc]sekstiljoonaa:sekstiljoonaa	LukusanaLiitesana_a	;
+[Bc]septiljoonaa:septiljoonaa	LukusanaLiitesana_a	;
+[Bc]sentiljoonaa:sentiljoonaa	LukusanaLiitesana_a	;
+
+LEXICON NumeromerkinAlku
+[Lu]:	Numeromerkki	;
+[Lu]:	PvmIpAlku	;
+
+LEXICON PvmIpAlku
+%0:%0	PvmIpJatko	;
+1:1	PvmIpJatko	;
+2:2	PvmIpJatko	;
+3:3	PvmIpJatko	;
+4:4	PvmIpJatko	;
+5:5	PvmIpJatko	;
+6:6	PvmIpJatko	;
+7:7	PvmIpJatko	;
+8:8	PvmIpJatko	;
+9:9	PvmIpJatko	;
+
+LEXICON PvmIpJatko
+PvmIpAlku	;
+.:.	PvmIpAlku2	;
+
+LEXICON PvmIpAlku2
+%0:%0	PvmIpJatko2	;
+1:1	PvmIpJatko2	;
+2:2	PvmIpJatko2	;
+3:3	PvmIpJatko2	;
+4:4	PvmIpJatko2	;
+5:5	PvmIpJatko2	;
+6:6	PvmIpJatko2	;
+7:7	PvmIpJatko2	;
+8:8	PvmIpJatko2	;
+9:9	PvmIpJatko2	;
+
+LEXICON PvmIpJatko2
+PvmIpAlku2	;
+.:.	PvmIpAlku3	;
+.:.	Loppu	;
+
+LEXICON PvmIpAlku3
+%0:%0	PvmIpJatko3	;
+1:1	PvmIpJatko3	;
+2:2	PvmIpJatko3	;
+3:3	PvmIpJatko3	;
+4:4	PvmIpJatko3	;
+5:5	PvmIpJatko3	;
+6:6	PvmIpJatko3	;
+7:7	PvmIpJatko3	;
+8:8	PvmIpJatko3	;
+9:9	PvmIpJatko3	;
+
+LEXICON PvmIpJatko3
+PvmIpAlku3	;
+.:.	PvmIpAlku3	;
+Loppu	;
+
+LEXICON Numeromerkki
+%0:%0	NumeromerkinJatko	;
+1:1	NumeromerkinJatko	;
+2:2	NumeromerkinJatko	;
+3:3	NumeromerkinJatko	;
+4:4	NumeromerkinJatko	;
+5:5	NumeromerkinJatko	;
+6:6	NumeromerkinJatko	;
+7:7	NumeromerkinJatko	;
+8:8	NumeromerkinJatko	;
+9:9	NumeromerkinJatko	;
+
+LEXICON NumeromerkkiPilkunJälkeen
+%0:%0	NumeromerkinJatkoPilkunJälkeen	;
+1:1	NumeromerkinJatkoPilkunJälkeen	;
+2:2	NumeromerkinJatkoPilkunJälkeen	;
+3:3	NumeromerkinJatkoPilkunJälkeen	;
+4:4	NumeromerkinJatkoPilkunJälkeen	;
+5:5	NumeromerkinJatkoPilkunJälkeen	;
+6:6	NumeromerkinJatkoPilkunJälkeen	;
+7:7	NumeromerkinJatkoPilkunJälkeen	;
+8:8	NumeromerkinJatkoPilkunJälkeen	;
+9:9	NumeromerkinJatkoPilkunJälkeen	;
+
+LEXICON NumeromerkinJatko
+Numeromerkki	;
+%::%:	Numeromerkki	;
+,:,	NumeromerkkiPilkunJälkeen	;
+YhdysmerkkiJaLukusananJälkiliite	;
+-:-	LukusananJälkiliiteJl	;
+LyhenteenTaivutuspääte_aä	;
+Loppu	;
+
+LEXICON NumeromerkinJatkoPilkunJälkeen
+NumeromerkkiPilkunJälkeen	;
+YhdysmerkkiJaLukusananJälkiliite	;
+Lyhenne_aä	;
+Loppu	;
+
+LEXICON LukusanaToista
+[Bc]toista[Xp][X]:toista	Liitesana_a	;
+[Bc]toista:toista	LukusananJälkiliite	;
+[Bc]toista:toista	LukusanaKerroinTuhatta	;
+[Bc]toista:toista	LukusananAlkuKerroin	;
+
+LEXICON JärjestyslukuToista
+[Bc]toista[Xp][X]:toista	Liitesana_a	;
+[Bc]toista:toista	LukusananJälkiliiteJl	;
+
+LEXICON YhdysmerkkiJaLukusananJälkiliite
+-:-	LukusananJälkiliiteEiYhdysmerkkiä	;
+-[Bc]:-	Loppu;
+
+LEXICON LukusananJälkiliite
+LukusananJälkiliiteEiYhdysmerkkiä	;
+LukusanaYsJatko	;
+-[Bc]:-	Loppu;
+
+LEXICON LukusananJälkiliiteEiYhdysmerkkiä
+[Bc][Bh]@P.YS_EI_GENETIIVIALKUA.ON@@P.YS_ALKANUT.ON@@P.YS_JATKETTAVA.ON@:@P.YS_EI_GENETIIVIALKUA.ON@@P.YS_ALKANUT.ON@@P.YS_JATKETTAVA.ON@	Sanasto_n	;
+LukusananErikoisjälkiliite	;
+
+LEXICON LukusananErikoisjälkiliite
+[Bc][Ll][Xp]karkeinen[X]karkei:karkei	LukusananJälkiliiteNainen_a	;
+[Bc][Ll][Xp]kiloinen[X]kiloi:kiloi	LukusananJälkiliiteNainen_a	;
+[Bc][Ln][Xp]kulmio[X]kulmio:kulmio	LukusananJälkiliiteAutio_a	;
+[Bc][Ln][Xp]luku[X]lu:lu	LukusananJälkiliiteLuku_a	; ! "kahdeksankymmentäluku"
+[Bc][Ll][Xp]tekijäinen[X]tekijäi:tekijäi	LukusananJälkiliiteNainen_ä	;
+[Bc][Ll][Xp]vuotias[X]vuotia:vuotia	LukusananJälkiliiteVieras_a	;
+
+LEXICON LukusananJälkiliiteJl
+[Bc][Ll][Xp]luokkalainen[X]luokkalai:luokkalai	LukusananJälkiliiteNainen_a	;
+[Bc][Ln][Xp]osa[X]os@P.YS_EI_JATKOA.ON@:os@P.YS_EI_JATKOA.ON@	LukusananJälkiliiteKoira_a	;
+LukusananJälkiliite	;
+
+LEXICON RoomalainenNumero
+[Lur][Xr]qq[X]ii[Xp][X][Sn][Ny]:ii	Loppu;
+[Lur][Xr]qqq[X]iii[Xp][X][Sn][Ny]:iii	Loppu;
+[Lur][Xr]qqqq[X]iiii[Xp][X][Sn][Ny]:iiii	Loppu;
+[Lur][Xr]qq[X]iv[Xp][X][Sn][Ny]:iv	Loppu;
+[Lur][Xr]qq[X]vi[Xp][X][Sn][Ny]:vi	Loppu;
+[Lur][Xr]qqq[X]vii[Xp][X][Sn][Ny]:vii	Loppu;
+[Lur][Xr]qqqq[X]viii[Xp][X][Sn][Ny]:viii	Loppu;
+[Lur][Xr]qqqqq[X]viiii[Xp][X][Sn][Ny]:viiii	Loppu;
+[Lur][Xr]qq[X]ix[Xp][X][Sn][Ny]:ix	Loppu;
+[Lur][Xr]jj[X]ii[Xp][X][Sn][Ny]:ii	RoomalaisenNumeronJatko_a;
+[Lur][Xr]jjj[X]iii[Xp][X][Sn][Ny]:iii	RoomalaisenNumeronJatko_a;
+[Lur][Xr]jjjj[X]iiii[Xp][X][Sn][Ny]:iiii	RoomalaisenNumeronJatko_ä;
+[Lur][Xr]jj[X]iv[Xp][X][Sn][Ny]:iv	RoomalaisenNumeronJatko_ä;
+[Lur][Xr]jj[X]vi[Xp][X][Sn][Ny]:vi	RoomalaisenNumeronJatko_a;
+[Lur][Xr]jjj[X]vii[Xp][X][Sn][Ny]:vii	RoomalaisenNumeronJatko_ä;
+[Lur][Xr]jjjj[X]viii[Xp][X][Sn][Ny]:viii	RoomalaisenNumeronJatko_a;
+[Lur][Xr]jjjjj[X]viiii[Xp][X][Sn][Ny]:viiii	RoomalaisenNumeronJatko_ä;
+[Lur][Xr]jj[X]ix[Xp][X][Sn][Ny]:ix	RoomalaisenNumeronJatko_ä;
+[Lur][Xr]qq[X]xi[Xp][X][Sn][Ny]:xi	Loppu;
+[Lur][Xr]qqq[X]xii[Xp][X][Sn][Ny]:xii	Loppu;
+[Lur][Xr]qqqq[X]xiii[Xp][X][Sn][Ny]:xiii	Loppu;
+[Lur][Xr]qqqqq[X]xiiii[Xp][X][Sn][Ny]:xiiii	Loppu;
+[Lur][Xr]qqq[X]xiv[Xp][X][Sn][Ny]:xiv	Loppu;
+[Lur][Xr]qq[X]xv[Xp][X][Sn][Ny]:xv	Loppu;
+[Lur][Xr]qqq[X]xvi[Xp][X][Sn][Ny]:xvi	Loppu;
+[Lur][Xr]qqqq[X]xvii[Xp][X][Sn][Ny]:xvii	Loppu;
+[Lur][Xr]qqqqq[X]xviii[Xp][X][Sn][Ny]:xviii	Loppu;
+[Lur][Xr]qqqqqq[X]xviiii[Xp][X][Sn][Ny]:xviiii	Loppu;
+[Lur][Xr]qqq[X]xix[Xp][X][Sn][Ny]:xix	Loppu;
+[Lur][Xr]qq[X]xx[Xp][X][Sn][Ny]:xx	Loppu;
+[Lur][Xr]jj[X]xi[Xp][X][Sn][Ny]:xi	RoomalaisenNumeronJatko_ä;
+[Lur][Xr]jjj[X]xii[Xp][X][Sn][Ny]:xii	RoomalaisenNumeronJatko_a;
+[Lur][Xr]jjjj[X]xiii[Xp][X][Sn][Ny]:xiii	RoomalaisenNumeronJatko_a;
+[Lur][Xr]jjjjj[X]xiiii[Xp][X][Sn][Ny]:xiiii	RoomalaisenNumeronJatko_ä;
+[Lur][Xr]jjj[X]xiv[Xp][X][Sn][Ny]:xiv	RoomalaisenNumeronJatko_ä;
+[Lur][Xr]jj[X]xv[Xp][X][Sn][Ny]:xv	RoomalaisenNumeronJatko_ä;
+[Lur][Xr]jjj[X]xvi[Xp][X][Sn][Ny]:xvi	RoomalaisenNumeronJatko_a;
+[Lur][Xr]jjjj[X]xvii[Xp][X][Sn][Ny]:xvii	RoomalaisenNumeronJatko_ä;
+[Lur][Xr]jjjjj[X]xviii[Xp][X][Sn][Ny]:xviii	RoomalaisenNumeronJatko_a;
+[Lur][Xr]jjjjjj[X]xviiii[Xp][X][Sn][Ny]:xviiii	RoomalaisenNumeronJatko_ä;
+[Lur][Xr]jjj[X]xix[Xp][X][Sn][Ny]:xix	RoomalaisenNumeronJatko_ä;
+[Lur][Xr]jj[X]xx[Xp][X][Sn][Ny]:xx	RoomalaisenNumeronJatko_a;
+[Lur][Xr]qqq[X]xxi[Xp][X][Sn][Ny]:xxi	Loppu;
+[Lur][Xr]qqqq[X]xxii[Xp][X][Sn][Ny]:xxii	Loppu;
+[Lur][Xr]qqqqq[X]xxiii[Xp][X][Sn][Ny]:xxiii	Loppu;
+[Lur][Xr]qqqqqq[X]xxiiii[Xp][X][Sn][Ny]:xxiiii	Loppu;
+[Lur][Xr]qqqq[X]xxiv[Xp][X][Sn][Ny]:xxiv	Loppu;
+[Lur][Xr]qqq[X]xxv[Xp][X][Sn][Ny]:xxv	Loppu;
+[Lur][Xr]qqqq[X]xxvi[Xp][X][Sn][Ny]:xxvi	Loppu;
+[Lur][Xr]qqqqq[X]xxvii[Xp][X][Sn][Ny]:xxvii	Loppu;
+[Lur][Xr]qqqqqq[X]xxviii[Xp][X][Sn][Ny]:xxviii	Loppu;
+[Lur][Xr]qqqqqqq[X]xxviiii[Xp][X][Sn][Ny]:xxviiii	Loppu;
+[Lur][Xr]qqqq[X]xxix[Xp][X][Sn][Ny]:xxix	Loppu;
+[Lur][Xr]qqq[X]xxx[Xp][X][Sn][Ny]:xxx	Loppu;
+[Lur][Xr]jjj[X]xxi[Xp][X][Sn][Ny]:xxi	RoomalaisenNumeronJatko_ä;
+[Lur][Xr]jjjj[X]xxii[Xp][X][Sn][Ny]:xxii	RoomalaisenNumeronJatko_a;
+[Lur][Xr]jjjjj[X]xxiii[Xp][X][Sn][Ny]:xxiii	RoomalaisenNumeronJatko_a;
+[Lur][Xr]jjjjjj[X]xxiiii[Xp][X][Sn][Ny]:xxiiii	RoomalaisenNumeronJatko_ä;
+[Lur][Xr]jjjj[X]xxiv[Xp][X][Sn][Ny]:xxiv	RoomalaisenNumeronJatko_ä;
+[Lur][Xr]jjj[X]xxv[Xp][X][Sn][Ny]:xxv	RoomalaisenNumeronJatko_ä;
+[Lur][Xr]jjjj[X]xxvi[Xp][X][Sn][Ny]:xxvi	RoomalaisenNumeronJatko_a;
+[Lur][Xr]jjjjj[X]xxvii[Xp][X][Sn][Ny]:xxvii	RoomalaisenNumeronJatko_ä;
+[Lur][Xr]jjjjjj[X]xxviii[Xp][X][Sn][Ny]:xxviii	RoomalaisenNumeronJatko_a;
+[Lur][Xr]jjjjjjj[X]xxviiii[Xp][X][Sn][Ny]:xxviiii	RoomalaisenNumeronJatko_ä;
+[Lur][Xr]jjjj[X]xxix[Xp][X][Sn][Ny]:xxix	RoomalaisenNumeronJatko_ä;
+[Lur][Xr]jjj[X]xxx[Xp][X][Sn][Ny]:xxx	RoomalaisenNumeronJatko_a;
+[Lur][Xr]qqqq[X]xxxi[Xp][X][Sn][Ny]:xxxi	Loppu;
+[Lur][Xr]qqqqq[X]xxxii[Xp][X][Sn][Ny]:xxxii	Loppu;
+[Lur][Xr]qqqqqq[X]xxxiii[Xp][X][Sn][Ny]:xxxiii	Loppu;
+[Lur][Xr]qqqqqqq[X]xxxiiii[Xp][X][Sn][Ny]:xxxiiii	Loppu;
+[Lur][Xr]qqqqq[X]xxxiv[Xp][X][Sn][Ny]:xxxiv	Loppu;
+[Lur][Xr]qqqq[X]xxxv[Xp][X][Sn][Ny]:xxxv	Loppu;
+[Lur][Xr]qqqqq[X]xxxvi[Xp][X][Sn][Ny]:xxxvi	Loppu;
+[Lur][Xr]qqqqqq[X]xxxvii[Xp][X][Sn][Ny]:xxxvii	Loppu;
+[Lur][Xr]qqqqqqq[X]xxxviii[Xp][X][Sn][Ny]:xxxviii	Loppu;
+[Lur][Xr]qqqqqqqq[X]xxxviiii[Xp][X][Sn][Ny]:xxxviiii	Loppu;
+[Lur][Xr]qqqqq[X]xxxix[Xp][X][Sn][Ny]:xxxix	Loppu;
+[Lur][Xr]qqqq[X]xxxx[Xp][X][Sn][Ny]:xxxx	Loppu;
+[Lur][Xr]qq[X]xl[Xp][X][Sn][Ny]:xl	Loppu;
+[Lur][Xr]jjjj[X]xxxi[Xp][X][Sn][Ny]:xxxi	RoomalaisenNumeronJatko_ä;
+[Lur][Xr]jjjjj[X]xxxii[Xp][X][Sn][Ny]:xxxii	RoomalaisenNumeronJatko_a;
+[Lur][Xr]jjjjjj[X]xxxiii[Xp][X][Sn][Ny]:xxxiii	RoomalaisenNumeronJatko_a;
+[Lur][Xr]jjjjjjj[X]xxxiiii[Xp][X][Sn][Ny]:xxxiiii	RoomalaisenNumeronJatko_ä;
+[Lur][Xr]jjjjj[X]xxxiv[Xp][X][Sn][Ny]:xxxiv	RoomalaisenNumeronJatko_ä;
+[Lur][Xr]jjjj[X]xxxv[Xp][X][Sn][Ny]:xxxv	RoomalaisenNumeronJatko_ä;
+[Lur][Xr]jjjjj[X]xxxvi[Xp][X][Sn][Ny]:xxxvi	RoomalaisenNumeronJatko_a;
+[Lur][Xr]jjjjjj[X]xxxvii[Xp][X][Sn][Ny]:xxxvii	RoomalaisenNumeronJatko_ä;
+[Lur][Xr]jjjjjjj[X]xxxviii[Xp][X][Sn][Ny]:xxxviii	RoomalaisenNumeronJatko_a;
+[Lur][Xr]jjjjjjjj[X]xxxviiii[Xp][X][Sn][Ny]:xxxviiii	RoomalaisenNumeronJatko_ä;
+[Lur][Xr]jjjjj[X]xxxix[Xp][X][Sn][Ny]:xxxix	RoomalaisenNumeronJatko_ä;
+[Lur][Xr]jjjj[X]xxxx[Xp][X][Sn][Ny]:xxxx	RoomalaisenNumeronJatko_a;
+[Lur][Xr]jj[X]xl[Xp][X][Sn][Ny]:xl	RoomalaisenNumeronJatko_ä;

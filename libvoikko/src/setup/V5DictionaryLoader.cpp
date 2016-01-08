@@ -82,9 +82,9 @@ Dictionary V5DictionaryLoader::dictionaryFromPath(const string & path) {
 	LanguageTag language;
 	language.setLanguage("fi");
 	string description;
-	BackendProperties morBackend("vfst", path, true);
+	BackendProperties morBackend("finnishVfst", path, true);
 	BackendProperties gramMorBackend;
-	BackendProperties grammarBackend("finnish", true);
+	BackendProperties grammarBackend("finnishVfst", path, true);
 	BackendProperties spellBackend("FinnishSpellerTweaksWrapper(AnalyzerToSpellerAdapter(currentAnalyzer),currentAnalyzer)", true);
 	BackendProperties suggestionBackend("FinnishSuggestionStrategy(currentAnalyzer)", true);
 	BackendProperties hyphenatorBackend("AnalyzerToFinnishHyphenatorAdapter(currentAnalyzer)", true);
@@ -107,6 +107,9 @@ Dictionary V5DictionaryLoader::dictionaryFromPath(const string & path) {
 		}
 		else if (line.find("Hyphenator-Backend: ") == 0) {
 			hyphenatorBackend = BackendProperties(line.substr(20), true);
+		}
+		else if (line.find("Grammar-Backend: ") == 0) {
+			grammarBackend = BackendProperties(line.substr(17), true);
 		}
 	}
 	file.close();

@@ -1,0 +1,130 @@
+! Voikko-fi, suomen kielen muoto-opin kuvaus.
+!
+! Tekijänoikeus © 2006 - 2015 Hannu Väisänen (Etunimi.Sukunimi@joensuu.fi)
+!                 2006 - 2015 Harri Pitkänen (hatapitk@iki.fi)
+!
+! This program is free software; you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation; either version 2, or (at your option)
+! any later version.
+!
+! This program is distributed in the hope that it will be useful, but
+! WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+! General Public License for more details.
+!
+! You should have received a copy of the GNU General Public License
+! along with this program; see the file COPYING.  If not, write to the
+! Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+! 02110-1301, USA.
+
+LEXICON Olla
+ll:ll        Johdin_nimitapa1A_a ;     # Olla.
+?Sukija [Tn1p]llakse:llakse Omistusliite_a ;  # Ollakseni, ollaksesi, jne.
+[Tn2]ll:ll          Johdin_nimitapa2_a ;
+l:l                 Johdin_nimitapa2_tAessA_a	;
+l:l                 Johdin_lUt_a ;
+l:l                 EhtoMahtoKäskytapa_tA_a ;
+le:le               Johdin_mA_a ;
+le:le               Johdin_vA_a ;
+l:l                 Johdin_tU_lA_a	;
+[Tt][Ap][P1][Ny][Ef]len:len     Liitesana_a ;  # Minä olen.
+[Tt][Ap][P2][Ny][Ef]let:let     Liitesana_a ;  # Sinä olet.
+[Tt][Ap][P3][Ny][Ef]n:n         Liitesana_a ;  # Hän on.
+[Tt][Ap][P3][Ny][Ef]mpi:mpi     Loppu       ;  # Hän ompi.
+[Tt][Ap][P1][Nm][Ef]lemme:lemme Liitesana_a ;  # Me olemme.
+[Tt][Ap][P2][Nm][Ef]lette:lette Liitesana_a ;  # Te olette.
+[Tt][Ap][P3][Nm][Ef]vat:vat     Liitesana_a ;  # He ovat.
+[Tt][Ai][P1][Ny][Ef]lin:lin     Liitesana_a ;  # Minä olin.
+[Tt][Ai][P2][Ny][Ef]lit:lit     Liitesana_a ;  # Sinä olit.
+[Tt][Ai][P3][Ny][Ef]li:li       Liitesana_a ;  # Hän oli.
+[Tt][Ai][P1][Nm][Ef]limme:limme Liitesana_a ;  # Me olimme.
+[Tt][Ai][P2][Nm][Ef]litte:litte Liitesana_a ;  # Te olitte.
+[Tt][Ai][P3][Nm][Ef]livat:livat Liitesana_a ;  # He olivat.
+l:l                     Ehtotapa_a ;   # Minä olisin, sinä olisit, jne.
+le:le                   Käskytapa_y2_a ;  # Ole.
+l:l                     Käskytapa_a ;
+l[Tk][Ap][P3][Ny][Ef]koon[Fkin]kin:lkoonkin	Loppu	;
+[Tt][Ap][P4][Ef]llaan:llaan Liitesana_a ;  # Ollaan.
+[Tt][Ai][P4][Ef]ltiin:ltiin Liitesana_a ;  # Oltiin.
+?Murre [Tt][Ap][P1][Ny][Ef]on:on     Liitesana_a ;  # Mä oon.
+?Murre [Tt][Ap][P2][Ny][Ef]ot:ot     Liitesana_a ;  # Sä oot.
+?Murre [Tt][Ap][P3][Ny][Ef]mpi:mpi   Liitesana_a ;  # Hän ompi.
+?Murre [Tt][Ap][P3][Ny][Ef]npi:npi   Liitesana_a ;  # Hän onpi.
+?Murre [Tt][Ap][P2][Nm][Ef]otte:otte Liitesana_a ;  # Te ootte.
+?Murre [Tt][Ap][P2][Nm][Ef]otta:otta Liitesana_a ;  # Te ootta.
+?Murre [Te][Ap][P1][Ny][Ef]isin:isin Liitesana_a ;  # Mä oisin jne.
+?Murre [Te][Ap][P2][Ny][Ef]isit:isit Liitesana_a ;
+?Murre [Te][Ap][P3][Ny][Eb]isi:isi   Liitesana_a ;
+?Murre [Te][Ap][P3][Ny][Eb]is:is     Liitesana_a ;
+?Murre [Te][Ap][P1][Nm][Ef]isimme:isimme Liitesana_a ;
+?Murre [Te][Ap][P2][Nm][Ef]isitte:isitte Liitesana_a ;
+?Murre [Te][Ap][P3][Nm][Ef]isivat:isivat Liitesana_a ;
+?Murre [Te][Ap][P3][Nm][Ef]isvat:isvat   Liitesana_a ;
+?Murre o:o       Loppu ;   # Ei oo.
+?Murre llos:llos Loppu ;   # Ollos huoleton.
+
+LEXICON Lienee
+n:n Mahtotapa_ä ;
+[Tm][Eb]:	Liitesana_ä	;
+
+LEXICON Kieltosana
+[Lk][Tk][Xp]ei[X]äl:äl    Älkää ;
+EtuliitteellinenKieltosana	;
+KieltosananEtuliite	;
+
+LEXICON KieltosananEtuliite
+[Xp]ehk[X]ehk:ehk	EtuliitteellinenKieltosanaEiKoPaHan	;
+[Xp]ell[X]ell:ell	EtuliitteellinenKieltosanaEiKoPaHan	;
+[Xp]ett[X]ett:ett	EtuliitteellinenKieltosanaEiKoPaHan	;
+[Xp]joll[X]joll:joll	EtuliitteellinenKieltosanaEiLoppu	;
+[Xp]jott[X]jott:jott	EtuliitteellinenKieltosanaEiLoppu	;
+[Xp]miks[X]miks:miks	EtuliitteellinenKieltosanaEiKoPaHan	;
+[Xp]vaikk[X]vaikk:vaikk	EtuliitteellinenKieltosanaEiLoppu	;
+[Xp]kosk[X]kosk:kosk	EtuliitteellinenKieltosanaEiLoppu	;
+[Xp]mutt[X]mutt:mutt	EtuliitteellinenKieltosanaEiLoppu	;
+
+LEXICON EtuliitteellinenKieltosana
+[Lk][Tt][Xp]ei[X]e:e         Ei ;
+'[Lk][Tt][Xp]ei[X]e:'e         Ei ;
+
+LEXICON Ei
+[P1][Ny]n:n        KieltosananLiitesana_ä ;
+[P2][Ny]t:t        KieltosananLiitesana_ä ;
+[P3][Ny]i:i        KieltosananLiitesana_ä ;
+[P1][Nm]mme:mme    KieltosananLiitesana_ä ;
+[P2][Nm]tte:tte    KieltosananLiitesana_ä ;
+[P3][Nm]ivät:ivät  KieltosananLiitesana_ä ;
+
+LEXICON EtuliitteellinenKieltosanaEiLoppu
+[Lk][Tt][Xp]ei[X][Bm]e:e         EiLoppu ;
+[Lk][Tt][Xp]ei[X][Bm]ei[Fkaan]kaan:eikaan         Loppu ;
+'[Lk][Tt][Xp]ei[X]e:'e         EiLoppu ;
+
+LEXICON EtuliitteellinenKieltosanaEiKoPaHan
+[Lk][Tt][Xp]ei[X][Bm]e:e         EiKoPaHan ;
+'[Lk][Tt][Xp]ei[X][Bm]e:'e         EiKoPaHan ;
+
+LEXICON EiLoppu
+[P1][Ny]n:n        Loppu ;
+[P2][Ny]t:t        Loppu ;
+[P3][Ny]i:i        Loppu ;
+[P1][Nm]mme:mme    Loppu ;
+[P2][Nm]tte:tte    Loppu ;
+[P3][Nm]ivät:ivät  Loppu ;
+
+LEXICON EiKoPaHan
+[P1][Ny]n:n        LiitesanaKoPaHan_ä ;
+[P2][Ny]t:t        LiitesanaKoPaHan_ä ;
+[P3][Ny]i:i        LiitesanaKoPaHan_ä ;
+[P1][Nm]mme:mme    LiitesanaKoPaHan_ä ;
+[P2][Nm]tte:tte    LiitesanaKoPaHan_ä ;
+[P3][Nm]ivät:ivät  LiitesanaKoPaHan_ä ;
+
+Lexicon Älkää
+[P2][Ny]ä:ä           KieltosananLiitesana_ä ;
+[P3][Ny]köön:köön     KieltosananLiitesana_ä ;
+[P1][Nm]käämme:käämme KieltosananLiitesana_ä ;
+[P2][Nm]kää:kää       KieltosananLiitesana_ä ;
+[P2][Nm]käätte:käätte KieltosananLiitesana_ä ;
+[P3][Nm]kööt:kööt     KieltosananLiitesana_ä ;

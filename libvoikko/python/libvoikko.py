@@ -47,8 +47,10 @@ An example session demonstrating the use of this module:
 # the provisions above, a recipient may use your version of this file under
 # the terms of any one of the MPL, the GPL or the LGPL.
 
-# This library requires Python version 2.5 or newer.
+# This library requires Python version 2.7 or newer. It is compatible with
+# Python 3 without modifications.
 
+from __future__ import unicode_literals
 from ctypes import byref
 from ctypes import CDLL
 from ctypes import c_int
@@ -62,6 +64,18 @@ from ctypes import POINTER
 from ctypes import string_at
 from ctypes import Structure
 import os
+import sys
+
+if sys.version_info < (3,):
+	unicode_str = unicode
+	binary_str = str
+	def repr_conv(s):
+		return s.encode("UTF-8")
+else:
+	unicode_str = str
+	binary_str = bytes
+	def repr_conv(s):
+		return s
 
 """Maximum number of characters in a valid word"""
 MAX_WORD_CHARS = 255
@@ -71,18 +85,21 @@ MAX_ANALYSIS_COUNT = 31
 
 class Dictionary:
 	"""Represents a morphological dictionary."""
-	def __init__(self, language, variant, description):
+	def __init__(self, language, script, variant, description):
 		self.language = language
+		self.script = script
 		self.variant = variant
 		self.description = description
 	
 	def __repr__(self):
-		return u"<" + self.language + u"," + self.variant + u"," + self.description + u">"
+		return repr_conv("<" + self.language + "," + self.script + "," + self.variant + "," + self.description + ">")
 	
 	def __lt__(self, other):
 		if not isinstance(other, Dictionary):
 			return False
 		if self.language < other.language:
+			return True
+		if self.script < other.script:
 			return True
 		if self.variant < other.variant:
 			return True
@@ -91,11 +108,12 @@ class Dictionary:
 	def __eq__(self, other):
 		return isinstance(other, Dictionary) and \
 		       self.language == other.language and \
+		       self.script == other.script and \
 		       self.variant == other.variant and \
 		       self.description == other.description
 	
 	def __hash__(self):
-		return hash(self.variant) ^ hash(self.description) ^ hash(self.language)
+		return hash(self.variant) ^ hash(self.description) ^ hash(self.language) ^ hash(self.script)
 
 class Token:
 	"""Represents a token in tokenized natural language text."""
@@ -112,8 +130,8 @@ class Token:
 		self.tokenType = tokenType
 	
 	def __repr__(self):
-		return (u"<" + self.tokenText + u"," + \
-		       Token._TYPE_NAMES[self.tokenType] + u">").encode("UTF-8")
+		return repr_conv("<" + self.tokenText + "," + \
+		       Token._TYPE_NAMES[self.tokenType] + ">")
 
 class Sentence:
 	"""Represents a sentence in natural language text."""
@@ -129,8 +147,8 @@ class Sentence:
 		self.nextStartType = nextStartType
 	
 	def __repr__(self):
-		return (u"<" + self.sentenceText + u"," + \
-		       Sentence._TYPE_NAMES[self.nextStartType] + u">").encode("UTF-8")
+		return repr_conv("<" + self.sentenceText + "," + \
+		       Sentence._TYPE_NAMES[self.nextStartType] + ">")
 
 class SuggestionStrategy:
 	"""Strategies for generating suggestions for incorrectly spelled words."""
@@ -144,18 +162,18 @@ class GrammarError:
 	"""Grammar error from grammar checker."""
 	
 	def __repr__(self):
-		return u"<" + self.toString() + u">"
+		return repr_conv("<" + self.toString() + ">")
 	
 	def toString(self):
-		s = u'[code=%i, level=0, descr="", stpos=%i, len=%i, suggs={' \
+		s = '[code=%i, level=0, descr="", stpos=%i, len=%i, suggs={' \
 		    % (self.errorCode, self.startPos, self.errorLen)
 		first = True
 		for suggestion in self.suggestions:
 			if not first:
-				s = s + u','
+				s = s + ','
 				first = False
-			s = s + u'"' + suggestion + u'"'
-		s = s + u"}]"
+			s = s + '"' + suggestion + '"'
+		s = s + "}]"
 		return s
 
 class VoikkoException(Exception):
@@ -171,20 +189,39 @@ def _boolToInt(bool):
 def _anyStringToUtf8(anyString):
 	if not anyString:
 		return None
-	if type(anyString) == unicode:
+	if type(anyString) == unicode_str:
 		return anyString.encode("UTF-8")
+	else:
+		return anyString
+
+def _anyStringToPath(anyString):
+	if not anyString:
+		return None
+	if type(anyString) == unicode_str:
+		return anyString.encode(sys.getfilesystemencoding())
 	else:
 		return anyString
 
 class Voikko(object):
 	def __getLib():
 		if os.name == 'nt':
-			return CDLL("libvoikko-1.dll")
-		elif sys.platform == 'darwin':
-			fileName = "libvoikko.1.dylib"
+			fileName = "libvoikko-1.dll"
 		else:
-			return CDLL("libvoikko.so.1")
+			fileName = "libvoikko.so.1"
+		if Voikko._sharedLibrarySearchPath is not None:
+			try:
+				return CDLL(Voikko._sharedLibrarySearchPath + os.sep + fileName)
+			except:
+				pass
+		return CDLL(fileName)
 	__getLib = staticmethod(__getLib)
+	
+	"""Set the path to a directory that should be used to search for the native library
+	before trying to load it from the default (OS specific) lookup path.
+	"""
+	def setLibrarySearchPath(searchPath):
+		Voikko._sharedLibrarySearchPath = searchPath
+	setLibrarySearchPath = staticmethod(setLibrarySearchPath)
 	
 	"""Represents an instance of Voikko. The instance has state, such as
 	settings related to spell checking and hyphenation, and methods for performing
@@ -270,22 +307,35 @@ class Voikko(object):
 		self.__lib.voikkoSetIntegerOption.restype = c_int
 		
 		error = c_char_p()
-		self.__handle = self.__lib.voikkoInit(byref(error), _anyStringToUtf8(language), _anyStringToUtf8(path))
+		self.__handle = self.__lib.voikkoInit(byref(error), _anyStringToUtf8(language), _anyStringToPath(path))
 		if error.value != None:
 			self.__handle = 0
-			raise VoikkoException(u"Initialization of Voikko failed: " + unicode(error.value, "UTF-8"))
+			raise VoikkoException("Initialization of Voikko failed: " + unicode_str(error.value, "UTF-8"))
 	
 	def __del__(self):
 		# Ensure that resources are freed before this object is deleted.
 		self.terminate()
 	
-	def __setBoolOption(self, option, value):
+	def setBooleanOption(self, option, value):
+		"""Sets a boolean option to specified value (True or False). This is a low level function
+		available for applications that know about the numerical option codes. The same options can also
+		be set using option specific setter methods.
+		"""
 		result = self.__lib.voikkoSetBooleanOption(self.__handle, option, _boolToInt(value))
 		if result == 0:
-			raise VoikkoException(u"Could not set boolean option " + str(option) + u" to value " + str(value) + u".")
+			raise VoikkoException("Could not set boolean option " + unicode_str(option) + " to value " + unicode_str(value) + ".")
+	
+	def setIntegerOption(self, option, value):
+		"""Sets a integer option to specified value. This is a low level function
+		available for applications that know about the numerical option codes. The same options can also
+		be set using option specific setter methods.
+		"""
+		result = self.__lib.voikkoSetIntegerOption(self.__handle, option, value)
+		if result == 0:
+			raise VoikkoException("Could not set integer option " + unicode_str(option) + " to value " + unicode_str(value) + ".")
 	
 	def __isValidInput(self, text):
-		return u"\0" not in text
+		return "\0" not in text
 	
 	def terminate(self):
 		"""Releases the resources allocated by libvoikko for this instance. The instance cannot be used anymore
@@ -316,24 +366,45 @@ class Voikko(object):
 		lib.voikko_free_dicts.restype = None
 		lib.voikko_dict_language.argtypes = [c_void_p]
 		lib.voikko_dict_language.restype = c_char_p
+		lib.voikko_dict_script.argtypes = [c_void_p]
+		lib.voikko_dict_script.restype = c_char_p
 		lib.voikko_dict_variant.argtypes = [c_void_p]
 		lib.voikko_dict_variant.restype = c_char_p
 		lib.voikko_dict_description.argtypes = [c_void_p]
 		lib.voikko_dict_description.restype = c_char_p
 		
-		cDicts = lib.voikko_list_dicts(_anyStringToUtf8(path))
+		cDicts = lib.voikko_list_dicts(_anyStringToPath(path))
 		dicts = []
 		i = 0
 		while bool(cDicts[i]):
 			cDict = cDicts[i]
-			language = unicode(lib.voikko_dict_language(cDict), "UTF-8")
-			variant = unicode(lib.voikko_dict_variant(cDict), "ASCII")
-			description = unicode(lib.voikko_dict_description(cDict), "UTF-8")
-			dicts.append(Dictionary(language, variant, description))
+			language = unicode_str(lib.voikko_dict_language(cDict), "UTF-8")
+			script = unicode_str(lib.voikko_dict_script(cDict), "UTF-8")
+			variant = unicode_str(lib.voikko_dict_variant(cDict), "ASCII")
+			description = unicode_str(lib.voikko_dict_description(cDict), "UTF-8")
+			dicts.append(Dictionary(language, script, variant, description))
 			i = i + 1
 		lib.voikko_free_dicts(cDicts)
 		return dicts
 	listDicts = staticmethod(listDicts)
+	
+	def __libForSupportedLanguages():
+		lib = Voikko.__getLib()
+		lib.voikkoFreeCstrArray.argtypes = [POINTER(c_char_p)]
+		lib.voikkoFreeCstrArray.restype = None
+		return lib
+	__libForSupportedLanguages = staticmethod(__libForSupportedLanguages)
+	
+	def __listSupportedLanguagesForOperation(path, lib, operation):
+		languages = []
+		cLanguages = operation(_anyStringToPath(path))
+		i = 0
+		while bool(cLanguages[i]):
+			languages.append(unicode_str(cLanguages[i], "UTF-8"))
+			i = i + 1
+		lib.voikkoFreeCstrArray(cLanguages)
+		return languages
+	__listSupportedLanguagesForOperation = staticmethod(__listSupportedLanguagesForOperation)
 	
 	def listSupportedSpellingLanguages(path = None):
 		"""Return a list of language codes representing the languages for which
@@ -341,29 +412,49 @@ class Voikko(object):
 		If path is specified, it will be searched first before looking from
 		the standard locations.
 		"""
-		lib = Voikko.__getLib()
+		lib = Voikko.__libForSupportedLanguages()
 		lib.voikkoListSupportedSpellingLanguages.argtypes = [c_char_p]
 		lib.voikkoListSupportedSpellingLanguages.restype = POINTER(c_char_p)
-		lib.voikkoFreeCstrArray.argtypes = [POINTER(c_char_p)]
-		lib.voikkoFreeCstrArray.restype = None
-		
-		languages = []
-		cLanguages = lib.voikkoListSupportedSpellingLanguages(path)
-		i = 0
-		while bool(cLanguages[i]):
-			languages.append(unicode(cLanguages[i], "UTF-8"))
-			i = i + 1
-		lib.voikkoFreeCstrArray(cLanguages)
-		return languages
+		def listOperation(p):
+			return lib.voikkoListSupportedSpellingLanguages(p)
+		return Voikko.__listSupportedLanguagesForOperation(path, lib, listOperation)
 	listSupportedSpellingLanguages = staticmethod(listSupportedSpellingLanguages)
-	
+
+	def listSupportedHyphenationLanguages(path = None):
+		"""Return a list of language codes representing the languages for which
+		at least one dictionary is available for hyphenation.
+		If path is specified, it will be searched first before looking from
+		the standard locations.
+		"""
+		lib = Voikko.__libForSupportedLanguages()
+		lib.voikkoListSupportedHyphenationLanguages.argtypes = [c_char_p]
+		lib.voikkoListSupportedHyphenationLanguages.restype = POINTER(c_char_p)
+		def listOperation(p):
+			return lib.voikkoListSupportedHyphenationLanguages(p)
+		return Voikko.__listSupportedLanguagesForOperation(path, lib, listOperation)
+	listSupportedHyphenationLanguages = staticmethod(listSupportedHyphenationLanguages)
+
+	def listSupportedGrammarCheckingLanguages(path = None):
+		"""Return a list of language codes representing the languages for which
+		at least one dictionary is available for grammar checking.
+		If path is specified, it will be searched first before looking from
+		the standard locations.
+		"""
+		lib = Voikko.__libForSupportedLanguages()
+		lib.voikkoListSupportedGrammarCheckingLanguages.argtypes = [c_char_p]
+		lib.voikkoListSupportedGrammarCheckingLanguages.restype = POINTER(c_char_p)
+		def listOperation(p):
+			return lib.voikkoListSupportedGrammarCheckingLanguages(p)
+		return Voikko.__listSupportedLanguagesForOperation(path, lib, listOperation)
+	listSupportedGrammarCheckingLanguages = staticmethod(listSupportedGrammarCheckingLanguages)
+
 	def getVersion():
 		"""Return the version number of the Voikko library."""
 		lib = Voikko.__getLib()
 		lib.voikkoGetVersion.argtypes = []
 		lib.voikkoGetVersion.restype = c_char_p
 		cVersion = lib.voikkoGetVersion()
-		return unicode(cVersion, "UTF-8")
+		return unicode_str(cVersion, "UTF-8")
 	getVersion = staticmethod(getVersion)
 	
 	def spell(self, word):
@@ -412,10 +503,10 @@ class Voikko(object):
 		if bool(cSuggestions):
 			i = 0
 			while bool(cSuggestions[i]):
-				gError.suggestions.append(unicode(cSuggestions[i], "UTF-8"))
+				gError.suggestions.append(unicode_str(cSuggestions[i], "UTF-8"))
 				i = i + 1
 		cErrorShortDescription = self.__lib.voikkoGetGrammarErrorShortDescription(cGrammarError, _anyStringToUtf8(language))
-		gError.shortDescription = unicode(string_at(cErrorShortDescription), "UTF-8")
+		gError.shortDescription = unicode_str(string_at(cErrorShortDescription), "UTF-8")
 		self.__lib.voikkoFreeErrorMessageCstr(cErrorShortDescription)
 		return gError
 	
@@ -443,10 +534,10 @@ class Voikko(object):
 		if not self.__isValidInput(text):
 			return []
 		
-		textUnicode = unicode(text)
+		textUnicode = unicode_str(text)
 		errorList = []
 		offset = 0
-		for paragraph in textUnicode.split(u"\n"):
+		for paragraph in textUnicode.split("\n"):
 			errorList = errorList + self.__grammarParagraph(paragraph, offset, language)
 			offset = offset + len(paragraph) + 1
 		return errorList
@@ -474,7 +565,7 @@ class Voikko(object):
 			while bool(cKeys[j]):
 				key = cKeys[j]
 				value = self.__lib.voikko_mor_analysis_value_ucs4(cAnalysis, key)
-				pAnalysis[unicode(key, 'ASCII')] = value
+				pAnalysis[unicode_str(key, 'ASCII')] = value
 				j = j + 1
 			pAnalysisList.append(pAnalysis)
 			i = i + 1
@@ -487,17 +578,17 @@ class Voikko(object):
 		startIndex = 0
 		tokens = []
 		while True:
-			i = text.find(u"\0", startIndex)
+			i = text.find("\0", startIndex)
 			if i == -1:
 				break
 			tokens = tokens + self.__splitTokens(text[startIndex:i])
-			tokens.append(Token(u"\0", Token.UNKNOWN))
+			tokens.append(Token("\0", Token.UNKNOWN))
 			startIndex = i + 1
 		tokens = tokens + self.__splitTokens(text[startIndex:])
 		return tokens
 	
 	def __splitTokens(self, text):
-		uniText = unicode(text)
+		uniText = unicode_str(text)
 		result = []
 		textLen = len(uniText)
 		tokenLen = c_size_t()
@@ -518,7 +609,7 @@ class Voikko(object):
 		if not self.__isValidInput(text):
 			return [Sentence(text, Sentence.NONE)]
 		
-		uniText = unicode(text)
+		uniText = unicode_str(text)
 		result = []
 		textLen = len(uniText)
 		sentenceLen = c_size_t()
@@ -548,20 +639,20 @@ class Voikko(object):
 		cHyphenationPattern = self.__lib.voikkoHyphenateUcs4(self.__handle, word)
 		hyphenationPattern = string_at(cHyphenationPattern)
 		self.__lib.voikkoFreeCstr(cHyphenationPattern)
-		return unicode(hyphenationPattern, 'ASCII')
+		return unicode_str(hyphenationPattern, 'ASCII')
 	
 	def hyphenate(self, word):
 		"""Return the given word in fully hyphenated form."""
 		pattern = self.getHyphenationPattern(word)
-		hyphenated = u""
+		hyphenated = ""
 		for i in range(len(pattern)):
 			patternC = pattern[i]
 			if patternC == ' ':
 				hyphenated = hyphenated + word[i]
 			elif patternC == '-':
-				hyphenated = hyphenated + u"-" + word[i]
+				hyphenated = hyphenated + "-" + word[i]
 			elif patternC == '=':
-				hyphenated = hyphenated + u"-"
+				hyphenated = hyphenated + "-"
 		return hyphenated
 	
 	def setIgnoreDot(self, value):
@@ -572,26 +663,26 @@ class Voikko(object):
 		will consider trailing dot of a word to be a part of that word.
 		Default: false
 		"""
-		self.__setBoolOption(0, value)
+		self.setBooleanOption(0, value)
 	
 	def setIgnoreNumbers(self, value):
 		"""Ignore words containing numbers.
 		Default: false
 		"""
-		self.__setBoolOption(1, value)
+		self.setBooleanOption(1, value)
 	
 	def setIgnoreUppercase(self, value):
 		"""Accept words that are written completely in uppercase letters without checking
 		them at all.
 		Default: false
 		"""
-		self.__setBoolOption(3, value)
+		self.setBooleanOption(3, value)
 	
 	def setAcceptFirstUppercase(self, value):
 		"""Accept words even when the first letter is in uppercase (start of sentence etc.)
 		Default: true
 		"""
-		self.__setBoolOption(6, value)
+		self.setBooleanOption(6, value)
 	
 	def setAcceptAllUppercase(self, value):
 		"""Accept words even when all of the letters are in uppercase. Note that this is
@@ -599,13 +690,13 @@ class Voikko(object):
 		checked, only case differences are ignored.
 		Default: true
 		"""
-		self.__setBoolOption(7, value)
+		self.setBooleanOption(7, value)
 	
 	def setIgnoreNonwords(self, value):
 		"""(Spell checking only): Ignore non-words such as URLs and email addresses.
 		Default: true
 		"""
-		self.__setBoolOption(10, value)
+		self.setBooleanOption(10, value)
 	
 	def setAcceptExtraHyphens(self, value):
 		"""(Spell checking only): Allow some extra hyphens in words. This option relaxes
@@ -614,7 +705,7 @@ class Voikko(object):
 		behaviour (if any) of this option is not specified.
 		Default: false
 		"""
-		self.__setBoolOption(11, value)
+		self.setBooleanOption(11, value)
 	
 	def setAcceptMissingHyphens(self, value):
 		"""(Spell checking only): Accept missing hyphens at the start and end of the word.
@@ -624,7 +715,7 @@ class Voikko(object):
 		this option may be used to tell libvoikko to work around this defect.
 		Default: false
 		"""
-		self.__setBoolOption(12, value)
+		self.setBooleanOption(12, value)
 	
 	def setAcceptTitlesInGc(self, value):
 		"""(Grammar checking only): Accept incomplete sentences that could occur in
@@ -633,53 +724,55 @@ class Voikko(object):
 		you are checking title text.
 		Default: false
 		"""
-		self.__setBoolOption(13, value)
+		self.setBooleanOption(13, value)
 	
 	def setAcceptUnfinishedParagraphsInGc(self, value):
 		"""(Grammar checking only): Accept incomplete sentences at the end of the
 		paragraph. These may exist when text is still being written.
 		Default: false
 		"""
-		self.__setBoolOption(14, value)
+		self.setBooleanOption(14, value)
 	
 	def setAcceptBulletedListsInGc(self, value):
 		"""(Grammar checking only): Accept paragraphs if they would be valid within
 		bulleted lists.
 		Default: false
 		"""
-		self.__setBoolOption(16, value)
+		self.setBooleanOption(16, value)
 	
 	def setNoUglyHyphenation(self, value):
 		"""Do not insert hyphenation positions that are considered to be ugly but correct
 		Default: false
 		"""
-		self.__setBoolOption(4, value)
+		self.setBooleanOption(4, value)
 	
 	def setHyphenateUnknownWords(self, value):
 		"""(Hyphenation only): Hyphenate unknown words.
 		Default: true
 		"""
-		self.__setBoolOption(15, value)
+		self.setBooleanOption(15, value)
 	
 	def setMinHyphenatedWordLength(self, value):
 		"""The minimum length for words that may be hyphenated. This limit is also enforced on
 		individual parts of compound words.
 		Default: 2
 		"""
-		self.__lib.voikkoSetIntegerOption(self.__handle, 9, value)
+		self.setIntegerOption(9, value)
 	
 	def setSpellerCacheSize(self, value):
 		"""Controls the size of in memory cache for spell checking results. 0 is the default size,
 		1 is twice as large as 0 etc. -1 disables the spell checking cache entirely."""
-		self.__lib.voikkoSetIntegerOption(self.__handle, 17, value)
+		self.setIntegerOption(17, value)
 	             
 	def setSuggestionStrategy(self, value):
 		"""Set the suggestion strategy to be used when generating spelling suggestions.
 		Default: SuggestionStrategy.TYPO
 		"""
 		if value == SuggestionStrategy.OCR:
-			self.__setBoolOption(8, True)
+			self.setBooleanOption(8, True)
 		elif value == SuggestionStrategy.TYPO:
-			self.__setBoolOption(8, False)
+			self.setBooleanOption(8, False)
 		else:
 			raise VoikkoException("Invalid suggestion strategy")
+
+Voikko._sharedLibrarySearchPath = None

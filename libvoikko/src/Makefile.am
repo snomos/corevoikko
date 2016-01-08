@@ -3,7 +3,10 @@ AUTOMAKE_OPTIONS=subdir-objects
 lib_LTLIBRARIES = libvoikko.la
 libvoikko_la_SOURCES = \
     fst/Configuration.cpp \
+    fst/WeightedConfiguration.cpp \
     fst/Transducer.cpp \
+    fst/UnweightedTransducer.cpp \
+    fst/WeightedTransducer.cpp \
     spellchecker/spell.cpp spellchecker/suggestions.cpp \
     spellchecker/Speller.cpp \
     spellchecker/SpellWithPriority.cpp \
@@ -77,13 +80,17 @@ libvoikko_la_SOURCES = \
     grammar/FinnishRuleEngine/SentenceCheck.cpp \
     grammar/FinnishRuleEngine/SidesanaCheck.cpp \
     compatibility/interface.cpp
-libvoikko_la_LDFLAGS = -no-undefined -version-info 14:1:13 @LIBLDFLAGSWIN@
+libvoikko_la_LDFLAGS = -no-undefined -version-info 15:1:14 @LIBLDFLAGSWIN@
 
 pkginclude_HEADERS = voikko.h voikko_enums.h voikko_defines.h voikko_deprecated.h voikko_structs.h
 noinst_HEADERS = \
     fst/Configuration.hpp \
+    fst/WeightedConfiguration.hpp \
     fst/Transducer.hpp \
     fst/Transition.hpp \
+    fst/WeightedTransition.hpp \
+    fst/UnweightedTransducer.hpp \
+    fst/WeightedTransducer.hpp \
     utils/utils.hpp utils/StringUtils.hpp \
     hyphenator/Hyphenator.hpp \
     hyphenator/AnalyzerToFinnishHyphenatorAdapter.hpp \
@@ -94,6 +101,7 @@ noinst_HEADERS = \
     morphology/AnalyzerFactory.hpp \
     morphology/HfstAnalyzer.hpp \
     morphology/VfstAnalyzer.hpp \
+    morphology/FinnishVfstAnalyzer.hpp \
     morphology/LttoolboxAnalyzer.hpp \
     morphology/NullAnalyzer.hpp \
     morphology/MalagaAnalyzer.hpp \
@@ -136,6 +144,8 @@ noinst_HEADERS = \
     spellchecker/SpellerFactory.hpp \
     spellchecker/SpellerCache.hpp \
     spellchecker/HfstSuggestion.hpp \
+    spellchecker/VfstSpeller.hpp \
+    spellchecker/VfstSuggestion.hpp \
     spellchecker/suggestion/Suggestion.hpp \
     spellchecker/suggestion/SuggestionGenerator.hpp \
     spellchecker/suggestion/SuggestionGeneratorFactory.hpp \
@@ -181,6 +191,7 @@ noinst_HEADERS = \
     grammar/FinnishRuleEngine/ParagraphCheck.hpp \
     grammar/FinnishRuleEngine/SentenceCheck.hpp \
     grammar/FinnishRuleEngine/SidesanaCheck.hpp \
+    grammar/FinnishRuleEngine/VfstAutocorrectCheck.hpp \
     autocorrect/AutoCorrect.hpp autocorrect/TrieNode.hpp \
     utf8/core.hpp \
     utf8/checked.hpp \
@@ -222,7 +233,9 @@ VISLCG3_CPP_FILES=grammar/CgRuleEngine.cpp \
 
 LTTOOLBOX_CPP_FILES=morphology/LttoolboxAnalyzer.cpp
 
-VFST_CPP_FILES=morphology/VfstAnalyzer.cpp spellchecker/VfstSpeller.cpp setup/V5DictionaryLoader.cpp
+VFST_CPP_FILES=morphology/VfstAnalyzer.cpp morphology/FinnishVfstAnalyzer.cpp \
+    spellchecker/VfstSpeller.cpp spellchecker/VfstSuggestion.cpp setup/V5DictionaryLoader.cpp \
+    grammar/FinnishRuleEngine/VfstAutocorrectCheck.cpp
 
 if HAVE_MALAGA
     libvoikko_la_SOURCES += $(MALAGA_CPP_FILES)

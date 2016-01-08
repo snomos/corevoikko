@@ -31,7 +31,7 @@
 
 #include "morphology/Analyzer.hpp"
 #include "setup/DictionaryException.hpp"
-#include "fst/Transducer.hpp"
+#include "fst/WeightedTransducer.hpp"
 #include "fst/Configuration.hpp"
 #include <list>
 #include <string>
@@ -44,28 +44,13 @@ namespace libvoikko { namespace morphology {
 class VfstAnalyzer : public Analyzer {
 	public:
 		VfstAnalyzer(const std::string & directoryName) throw(setup::DictionaryException);
-		std::list<Analysis *> * analyze(const wchar_t * word);
-		std::list<Analysis *> * analyze(const wchar_t * word, size_t wlen);
-		std::list<Analysis *> * analyze(const char * word);
+		std::list<Analysis *> * analyze(const wchar_t * word, size_t wlen, bool fullMorphology);
+		std::list<Analysis *> * analyze(const char * word, bool fullMorphology);
 		void terminate();
 	private:
-		fst::Transducer * transducer;
-		fst::Configuration * configuration;
+		fst::WeightedTransducer * transducer;
+		fst::WeightedConfiguration * configuration;
 		char * outputBuffer;
-		std::map<std::wstring, std::wstring> classMap;
-		std::map<std::wstring, std::wstring> sijamuotoMap;
-		std::map<std::wstring, std::wstring> moodMap;
-		std::map<std::wstring, std::wstring> numberMap;
-		std::map<std::wstring, std::wstring> comparisonMap;
-		std::map<std::wstring, std::wstring> personMap;
-		std::map<std::wstring, std::wstring> tenseMap;
-		std::map<std::wstring, std::wstring> focusMap;
-		std::map<std::wstring, std::wstring> possessiveMap;
-		std::map<std::wstring, std::wstring> negativeMap;
-		std::map<std::wstring, std::wstring> participleMap;
-		
-		void parseBasicAttributes(Analysis * analysis, const wchar_t * fstOutput, size_t fstLen);
-		void duplicateOrgName(Analysis * analysis, std::list<Analysis *> * analysisList);
 };
 
 } }

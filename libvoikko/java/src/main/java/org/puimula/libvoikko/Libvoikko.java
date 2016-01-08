@@ -28,6 +28,7 @@
 
 package org.puimula.libvoikko;
 
+import java.nio.ByteBuffer;
 import com.sun.jna.Library;
 import com.sun.jna.Pointer;
 import com.sun.jna.PointerType;
@@ -59,6 +60,8 @@ interface Libvoikko extends Library {
     public abstract void voikko_free_dicts(Pointer dicts);
     
     public abstract ByteArray voikko_dict_language(Pointer dict);
+    
+    public abstract ByteArray voikko_dict_script(Pointer dict);
     
     public abstract ByteArray voikko_dict_variant(Pointer dict);
     
@@ -95,7 +98,7 @@ interface Libvoikko extends Library {
     
     public abstract void voikko_free_mor_analysis_value_cstr(ByteArray analysisValue);
     
-    public abstract int voikkoNextTokenCstr(VoikkoHandle handle, byte[] text, SizeT textLen,
+    public abstract int voikkoNextTokenCstr(VoikkoHandle handle, ByteBuffer text, SizeT textLen,
             SizeTByReference tokenLen);
     
     public abstract int voikkoNextSentenceStartCstr(VoikkoHandle handle, byte[] text, SizeT textLen,
