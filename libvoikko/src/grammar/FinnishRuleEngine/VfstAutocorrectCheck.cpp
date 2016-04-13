@@ -42,8 +42,8 @@ static const size_t BUFFER_SIZE = 20000;
 VfstAutocorrectCheck::VfstAutocorrectCheck(const string & fileName) throw(setup::DictionaryException) {
 	transducer = new fst::UnweightedTransducer(fileName.c_str());
 	configuration = new fst::Configuration(transducer->getFlagDiacriticFeatureCount(), BUFFER_SIZE);
-	inputBuffer = new char[BUFFER_SIZE + 1];
-	outputBuffer = new char[BUFFER_SIZE + 1];
+	inputBuffer = new wchar_t[BUFFER_SIZE + 1];
+	outputBuffer = new wchar_t[BUFFER_SIZE + 1];
 }
 
 VfstAutocorrectCheck::~VfstAutocorrectCheck() {
@@ -83,7 +83,7 @@ bool VfstAutocorrectCheck::check(voikko_options_t * options, const Sentence * se
 			if (sentenceLengthUtf >= BUFFER_SIZE) {
 				return false; // sentence is unreasonably long
 			}
-			inputBuffer[sentenceLengthUtf] = ' ';
+			inputBuffer[sentenceLengthUtf] = L' ';
 			ucsNormalizedPositions.push_back(ucsNormalizedPositions[i] + 1);
 		}
 		else {
@@ -96,14 +96,20 @@ bool VfstAutocorrectCheck::check(voikko_options_t * options, const Sentence * se
 			else {
 				tokenStr = token->str;
 			}
-			tokenUtfLen = utils::StringUtils::utf8FromUcs4(tokenStr, token->tokenlen,
-			              inputBuffer + sentenceLengthUtf, BUFFER_SIZE - sentenceLengthUtf,
-			              L"\u00AD", &skippedChars);
+			if (sentenceLengthUtf + token->tokenlen >= BUFFER_SIZE) {
+				return false; // sentence is unreasonably long
+			}
+			for (size_t i = 0; i < token->tokenlen; i++) {
+				if (::wcschr(L"\u00AD", tokenStr[i])) {
+					skippedChars++;
+				}
+				else {
+					inputBuffer[sentenceLengthUtf + i - skippedChars] = tokenStr[i];
+				}
+			}
+			tokenUtfLen = token->tokenlen - skippedChars;
 			if (lowerFirst && i == 0) {
 				delete[] tokenStr;
-			}
-			if (tokenUtfLen == BUFFER_SIZE - sentenceLengthUtf + 1) {
-				return false; // sentence is unreasonably long
 			}
 			ucsNormalizedPositions.push_back(ucsNormalizedPositions[i] + token->tokenlen - skippedChars);
 		}
@@ -150,14 +156,9 @@ bool VfstAutocorrectCheck::check(voikko_options_t * options, const Sentence * se
 			}
 			e->error.setErrorLen(prefixLength + lengthCorrection);
 			if (lowerFirst) {
-				wchar_t * outputUcs = utils::StringUtils::ucs4FromUtf8(outputBuffer);
-				outputUcs[0] = character::SimpleChar::upper(outputUcs[0]);
-				e->error.getSuggestions()[0] = utils::StringUtils::utf8FromUcs4(outputUcs);
-				delete[] outputUcs;
+				outputBuffer[0] = character::SimpleChar::upper(outputBuffer[0]);
 			}
-			else {
-				e->error.getSuggestions()[0] = utils::StringUtils::copy(outputBuffer);
-			}
+			e->error.getSuggestions()[0] = utils::StringUtils::utf8FromUcs4(outputBuffer);
 			options->grammarChecker->cache.appendError(e);
 		}
 		else {

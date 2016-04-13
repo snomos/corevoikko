@@ -48,6 +48,7 @@ VOIKKOEXPORT voikko_mor_analysis ** voikkoAnalyzeWordUcs4(
 	list<Analysis *>::const_iterator it = analyses->begin();
 	size_t i = 0;
 	while (it != analyses->end()) {
+		(*it)->seal();
 		result[i++] = *it++;
 	}
 	result[i] = 0;
@@ -73,7 +74,7 @@ VOIKKOEXPORT const char ** voikko_mor_analysis_keys(
 VOIKKOEXPORT const wchar_t * voikko_mor_analysis_value_ucs4(
                              const voikko_mor_analysis * analysis,
                              const char * key) {
-	return analysis->getValue(key);
+	return analysis->getValueS(key);
 }
 
 VOIKKOEXPORT voikko_mor_analysis ** voikkoAnalyzeWordCstr(

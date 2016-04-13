@@ -28,7 +28,7 @@
 
 dnl General options for autoconf
 AC_PREREQ(2.60)
-AC_INIT([libvoikko],[4.0],[hatapitk@iki.fi])
+AC_INIT([libvoikko],[4.0.2],[hatapitk@iki.fi])
 
 LT_PREREQ([2.2.6])
 
@@ -50,6 +50,7 @@ AM_MAINTAINER_MODE
 dnl Compiler features
 AC_LANG_CPLUSPLUS
 AC_C_CONST
+AX_CXX_COMPILE_STDCXX(11, noext, mandatory)
 
 # Prepare platform specific setups (sets $host_os a.o.):
 AC_CANONICAL_HOST
@@ -236,3 +237,18 @@ Libvoikko was configured with the following options
   * Morphology compilers:           $buildtools
   * Simple client programs:         $testtools
 EOF
+if test x$DICTIONARY_PATH = x; then
+cat <<EOF
+  * Fallback dictionary path:       (none)
+  NOTE!  As of libvoikko 4.0 NO HARDCODED FALLBACK DICTIONARY PATH
+  NOTE!  IS USED unless one is specified using --with-dictionary-path.
+  NOTE!  If you intend to use libvoikko for writing aids in
+  NOTE!  end user applications we strongly suggest adding the following:
+  NOTE!  OS X: --with-dictionary-path=/Library/Spelling/voikko:/usr/lib/voikko
+  NOTE!  Linux: --with-dictionary-path=/usr/share/voikko:/usr/lib/voikko
+EOF
+else
+cat <<EOF
+  * Fallback dictionary path:       $DICTIONARY_PATH
+EOF
+fi

@@ -51,19 +51,24 @@ An example session demonstrating the use of this module:
 # Python 3 without modifications.
 
 from __future__ import unicode_literals
+from ctypes import addressof
 from ctypes import byref
 from ctypes import CDLL
 from ctypes import c_int
 from ctypes import c_char
 from ctypes import c_char_p
+from ctypes import c_wchar
 from ctypes import c_wchar_p
 from ctypes import c_size_t
 from ctypes import c_void_p
+from ctypes import create_unicode_buffer
 from ctypes import pointer
 from ctypes import POINTER
+from ctypes import sizeof
 from ctypes import string_at
 from ctypes import Structure
 import os
+import platform
 import sys
 
 if sys.version_info < (3,):
@@ -206,15 +211,32 @@ class Voikko(object):
 	def __getLib():
 		if os.name == 'nt':
 			fileName = "libvoikko-1.dll"
+			if platform.architecture()[0] == "64bit":
+				optionalDependencies = ["libgcc_s_seh-1.dll", "libstdc++-6.dll", "zlib1.dll", "libarchive-13.dll", "libhfstospell-5.dll"]
+			else:
+				optionalDependencies = ["libgcc_s_sjlj-1.dll", "libstdc++-6.dll", "zlib1.dll", "libarchive-13.dll", "libhfstospell-5.dll"]
 		elif sys.platform == 'darwin':
 			fileName = "libvoikko.1.dylib"
+			optionalDependencies = ["libtinyxml2.3.dylib", "libarchive.13.dylib", "libhfstospell.5.dylib"]
 		else:
 			fileName = "libvoikko.so.1"
+			optionalDependencies = []
 		if Voikko._sharedLibrarySearchPath is not None:
 			try:
 				return CDLL(Voikko._sharedLibrarySearchPath + os.sep + fileName)
 			except:
-				pass
+				optDeps = []
+				for optionalDep in optionalDependencies:
+					try:
+						optDeps.append(CDLL(Voikko._sharedLibrarySearchPath + os.sep + optionalDep))
+					except:
+						pass
+				try:
+					cdll = CDLL(Voikko._sharedLibrarySearchPath + os.sep + fileName)
+					cdll.voikkoDeps = optDeps
+					return cdll
+				except:
+					pass
 		return CDLL(fileName)
 	__getLib = staticmethod(__getLib)
 	
@@ -591,13 +613,15 @@ class Voikko(object):
 	
 	def __splitTokens(self, text):
 		uniText = unicode_str(text)
+		uniTextPtr = create_unicode_buffer(uniText)
+		wcharSize = sizeof(c_wchar)
 		result = []
 		textLen = len(uniText)
 		tokenLen = c_size_t()
 		position = 0
 		while textLen > 0:
 			tokenType = self.__lib.voikkoNextTokenUcs4(self.__handle,
-			            uniText[position:], textLen, byref(tokenLen))
+			            c_wchar_p(addressof(uniTextPtr) + position * wcharSize), textLen, byref(tokenLen))
 			if tokenType == Token.NONE:
 				break
 			tokenText = uniText[position:position+tokenLen.value]

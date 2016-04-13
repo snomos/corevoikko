@@ -226,7 +226,7 @@ public class Voikko {
             return errorList;
         }
         int offset = 0;
-        for (String paragraph : text.split("\\r?\\n")) {
+        for (String paragraph : text.replace("\r", "\n").split("\\n")) {
             appendErrorsFromParagraph(errorList, paragraph, offset, language);
             offset += paragraph.length() + 1;
         }
@@ -331,7 +331,7 @@ public class Voikko {
         ByteBuffer textBytes = s2bb(text);
         int bytesStart = 0;
         int textStart = 0;
-        int bytesLen = textBytes.capacity() - 1;
+        int bytesLen = textBytes.capacity();
         SizeTByReference tokenLenByRef = new SizeTByReference();
         while (bytesLen > 0) {
             textBytes.position(bytesStart);
@@ -620,8 +620,9 @@ public class Voikko {
      * @param libraryPath
      */
     public static void addLibraryPath(String libraryPath) {
-        NativeLibrary.addSearchPath("voikko", libraryPath);
-        NativeLibrary.addSearchPath("voikko-1", libraryPath);
+        for (String libraryName : LIBRARY_NAMES) {
+	    NativeLibrary.addSearchPath(libraryName, libraryPath);
+        }
     }
 
 }

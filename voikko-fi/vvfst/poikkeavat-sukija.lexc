@@ -1,6 +1,6 @@
 ! Voikko-fi, suomen kielen muoto-opin kuvaus.
 !
-! Tekijänoikeus © 2006 - 2015 Hannu Väisänen (Etunimi.Sukunimi@joensuu.fi)
+! Tekijänoikeus © 2006 - 2016 Hannu Väisänen (Etunimi.Sukunimi@joensuu.fi)
 !
 ! This program is free software; you can redistribute it and/or modify
 ! it under the terms of the GNU General Public License as published by
@@ -231,6 +231,8 @@ LEXICON SukijaPoikkeavat_n
 [Ln][Xp]ien[X]ien[Ses][Ny]nä:iennä NimisanaLiOlV_ä ;
 [Ln][Xp]kappale[X][Sg][Nm]kappalt:kappalt NimisanaMonikonGenetiiviEnJatko_a ;
 [Ln][Xp]kiiru[X]kiiru:kiiru SukijaKiiru ;
+[Ln][Xp]käviä[X]kävi:kävi NimisanaApila_ä ;
+[Ln][Xp]kävijä[X]kävi:kävi NimisanaApila_ä ;
 [Ln][Xp]linnanimpi[X]linnan[Bm]im:linnanim NimisanaSampi_ä ;
 [Ln][Xp]maailma[X]maailmoitse:maailmoitse Loppu ;
 [Ln][Xp]maalaisimpi[X]maalais[Bm]im:maalaisim NimisanaSampi_ä ;
@@ -238,10 +240,17 @@ LEXICON SukijaPoikkeavat_n
 [Ln][Xp]muistiin=palautuminen[X]muistiin[Bm]palautumi:muistiinpalautumi NimisanaNainen_a ;
 [Ln][Xp]neiti[X]nei:nei SukijaNeiti ;
 [Ln][Xp]nuorimies[X]nuorna[Bm]miesnä:nuornamiesnä NimisanaLiOlV_ä ;
+[Ln][Xp]oopium[X]oopium:oopium NimisanaKalsium_a ;
+[Ln][Xp]oopium[X]ooppium:ooppium NimisanaKalsium_a ;
+[Ln][Xp]oopiumi[X]oopium:oopium NimisanaKalsium_a ;
+[Ln][Xp]oopiumi[X]ooppium:ooppium NimisanaKalsium_a ;
 [Ln][Xp]ori[X]ori:ori   SukijaOri ;
 [Ln][Xp]ruoka[X]ru:ru   SukijaRuoka ;
+[Ln][Xp]sosiaali=demo=kratia[X]sosiali[Bm]demo[Bm]krati:sosialidemokrati NimisanaApila_a ;
 [Ln][Xp]sydän[X]sydämm:sydämm NimisanaUistin_m_ä ;
 [Ln][Xp]uros[X]uro:uro  SukijaUros ;
+[Ln][Xp]vartia[X]varti:varti NimisanaApila_a ;
+[Ln][Xp]vartija[X]varti:varti NimisanaApila_a ;
 [Ln][Xp]venäjä[X]venä[Sp][Ny]ttä:venättä NimisanaLiOlV_ä ;
 [Ln][Xp]yhteen=sattuvaisuus[X]yhteen[Bm]sattuvaisuu:yhteensattuvaisuu NimisanaKalleus_a ;
 [Ln][Xp]yhteen=sopivaisuus[X]yhteen[Bm]sopivaisuu:yhteensopivaisuu    NimisanaKalleus_a ;
@@ -347,7 +356,11 @@ LEXICON Sukija_p
 [Lp]loppuun:loppuun EtuliitteenJatko_ellelnelt;
 [Lp]lyhyt:lyhyt EtuliitteenJatko_ellelnelt;
 [Lp]maahan:maahan EtuliitteenJatko_ellelnelt;
+[Lp]malaijan:malaijan EtuliitteenJatko_ellelnelt;
+[Lp]malakan:malakan EtuliitteenJatko_ellelnelt;
+[Lp]malawin:malawin EtuliitteenJatko_ellelnelt;
 [Lp]marjo:marjo EtuliitteenJatko_ellelnelt;
+[Lp]mauritiuksen:mauritiuksen EtuliitteenJatko_ellelnelt;
 [Lp]miljoona:miljoona EtuliitteenJatko_ellelnelt;
 [Lp]minkä:minkä EtuliitteenJatko_ellelnelt;
 [Lp]ohitse:ohitse EtuliitteenJatko_ellelnelt;
@@ -660,7 +673,7 @@ LEXICON SukijaPoikkeavat_l
 [Ll][Xp]kiirunalainen[X]kiirun[Bm]alai:kiirunalai LaatusanaNainenInen_a ;
 [Ll][Xp]kultainen[X]kullai:kullai LaatusanaNainenInen_a ;
 [Ll][Xp]muistiin=painuva[X]muistiin[Bm]painuv:muistiinpainuv LaatusanaAsema_a ;
-[Ll][Xp]monenlainen[X]monel[Bm]lai:monellai LaatusanaNainenInen_a ;
+[Ll][Xp]monen=lainen[X]monel[Bm]lai:monellai LaatusanaNainenInen_a ;
 [Ll][Xp]oktaaninen[X]oktani:oktani LaatusanaNainenInen_a ;
 [Ll][Xp]pieni[X]pien:pien LaatusanaSukijaPieni_ä ;
 [Ll][Xp]peilityyni[X]peili[Bm]tyyn:peilityyn LaatusanaSukijaPieni_ä ;
@@ -674,25 +687,26 @@ LEXICON SukijaPoikkeavat_l
 [Ll][Xp]tuollainen[X]tollai:tollai LaatusanaNainenInen_a ;
 [Ll][Xp]tyyni[X]tyyn:tyyn LaatusanaSukijaPieni_ä ;
 [Ll][Xp]yhdenlainen[X]yhdellai:yhdellai LaatusanaNainenInen_a ;
-[Ll][Xp]epähuomaavainen[X]epä[Bm]huomaavai:epähuomaavai LaatusanaNainenInen_a ;
-[Ll][Xp]epäluottavainen[X]epä[Bm]luottavai:epäluottavai LaatusanaNainenInen_a ;
-[Ll][Xp]epäonnistuvainen[X]epä[Bm]onnistuvai:epäonnistuvai LaatusanaNainenInen_a ;
-[Ll][Xp]epätyytyväinen[X]epä[Bm]tyytyväi:epätyytyväi LaatusanaNainenInen_ä ;
-[Ll][Xp]epäuskovainen[X]epä[Bm]uskovai:epäuskovai LaatusanaNainenInen_a ;
-[Ll][Xp]epäyhteneväinen [X]epä[Bm]yhteneväi:epäyhteneväi LaatusanaNainenInen_ä ;
-[Ll][Xp]keltavalkoinen[X]kelta[Bm]valkoi:keltavalkoi LaatusanaNainenInen_a ;
-[Ll][Xp]keltavartinen[X]kelta[Bm]varti:keltavarti LaatusanaNainenInen_a ;
-[Ll][Xp]keltaverinen[X]kelta[Bm]veri:keltaveri LaatusanaNainenInen_ä ;
-[Ll][Xp]omakutoinen[X]oma[Bm]kutoi:omakutoi LaatusanaNainenInen_a ;
-[Ll][Xp]omarahoitteinen[X]oma[Bm]rahoittei:omarahoittei LaatusanaNainenInen_a ;
-[Ll][Xp]omarakenteinen[X]oma[Bm]rakentei:omarakentei LaatusanaNainenInen_a ;
-[Ll][Xp]peräänantavainen[X]perään[Bm]antavai:peräänantavai LaatusanaNainenInen_a ;
-[Ll][Xp]päälletunkevainen[X]päälle[Bm]tunkevai:päälletunkevai LaatusanaNainenInen_a ;
-[Ll][Xp]sinikeltavalkoinen[X]sini[Bm]kelta[Bm]valkoi:sinikeltavalkoi LaatusanaNainenInen_a ;
-[Ll][Xp]tosikristillinen[X]tosi[Bm]kristilli:tosikristilli LaatusanaNainenInen_ä ;
+[Ll][Xp]epä=huomaavainen[X]epä[Bm]huomaavai:epähuomaavai LaatusanaNainenInen_a ;
+[Ll][Xp]epä=luottavainen[X]epä[Bm]luottavai:epäluottavai LaatusanaNainenInen_a ;
+[Ll][Xp]epä=onnistuvainen[X]epä[Bm]onnistuvai:epäonnistuvai LaatusanaNainenInen_a ;
+[Ll][Xp]epä=tyytyväinen[X]epä[Bm]tyytyväi:epätyytyväi LaatusanaNainenInen_ä ;
+[Ll][Xp]epä=uskovainen[X]epä[Bm]uskovai:epäuskovai LaatusanaNainenInen_a ;
+[Ll][Xp]epä=yhteneväinen [X]epä[Bm]yhteneväi:epäyhteneväi LaatusanaNainenInen_ä ;
+[Ll][Xp]kelta=valkoinen[X]kelta[Bm]valkoi:keltavalkoi LaatusanaNainenInen_a ;
+[Ll][Xp]kelta=vartinen[X]kelta[Bm]varti:keltavarti LaatusanaNainenInen_a ;
+[Ll][Xp]kelta=verinen[X]kelta[Bm]veri:keltaveri LaatusanaNainenInen_ä ;
+[Ll][Xp]oma=kutoinen[X]oma[Bm]kutoi:omakutoi LaatusanaNainenInen_a ;
+[Ll][Xp]oma=rahoitteinen[X]oma[Bm]rahoittei:omarahoittei LaatusanaNainenInen_a ;
+[Ll][Xp]oma=rakenteinen[X]oma[Bm]rakentei:omarakentei LaatusanaNainenInen_a ;
+[Ll][Xp]perään=antavainen[X]perään[Bm]antavai:peräänantavai LaatusanaNainenInen_a ;
+[Ll][Xp]päälle=tunkevainen[X]päälle[Bm]tunkevai:päälletunkevai LaatusanaNainenInen_a ;
+[Ll][Xp]sini=kelta=valkoinen[X]sini[Bm]kelta[Bm]valkoi:sinikeltavalkoi LaatusanaNainenInen_a ;
+[Ll][Xp]sosiaali=demo=kraattinen[X]sosiali[Bm]demo[Bm]krati:sosialidemokrati LaatusanaNainenInen_a ;
+[Ll][Xp]tosi=kristillinen[X]tosi[Bm]kristilli:tosikristilli LaatusanaNainenInen_ä ;
 [Ll][Xp]yksi=toikkoinen[X]yks[Bm]toikkoi:ykstoikkoi LaatusanaNainenInen_a ;
-[Ll][Xp]ylitsevuotavainen[X]ylitse[Bm]vuotavai:ylitsevuotavai LaatusanaNainenInen_a ;
-[Ll][Xp]ylösrakentavainen[X]ylös[Bm]rakentavai:ylösrakentavai LaatusanaNainenInen_a ;
+[Ll][Xp]ylitse=vuotavainen[X]ylitse[Bm]vuotavai:ylitsevuotavai LaatusanaNainenInen_a ;
+[Ll][Xp]ylös=rakentavainen[X]ylös[Bm]rakentavai:ylösrakentavai LaatusanaNainenInen_a ;
 
 LEXICON SukijaPoikkeavat_nl
 [Lnl][Xp]juoni[X]juon:juon NimiLaatusanaSukijaPieni_a ;
@@ -700,6 +714,7 @@ LEXICON SukijaPoikkeavat_nl
 [Lnl][Xp]kaikenlainen[X]kaikel[Bm]lai:kaikellai NimiLaatusanaNainenInen_a ;
 [Lnl][Xp]läsnäasuvainen[X]läsnä[Bm]asuvai:läsnäasuvai NimiLaatusanaNainenInen_a ;
 [Lnl][Xp]läsnäolevainen[X]läsnä[Bm]olevai:läsnäolevai NimiLaatusanaNainenInen_a ;
+[Lnl][Xp]radikaalinen[X]radikali:radikali NimiLaatusanaNainenInen_a ;
 [Lnl][Xp]ranskalainen[X]franska[Bm]lai:franskalai  NimiLaatusanaNainenInen_a ;
 [Lnl][Xp]roomalainen[X]roma[Bm]lai:romalai      NimiLaatusanaNainenInen_a ;
 [Lnl][Xp]suurenmoinen[X]suurem[Bm]moi:suuremmoi NimiLaatusanaNainenInen_a ;
@@ -718,9 +733,7 @@ LEXICON SukijaPoikkeavat_t
 [Lt][Xp]ratista[X]rat:rat Kihajaa_a ;
 [Lt][Xp]ritistä[X]rit:rit Kihajaa_a ;
 [Lt][Xp]vapista[X]vap:vap Kihajaa_a ;
+[Lt][Xp]perkata[X]perk:perk Taata_a ;
 [Lt][Xp]muistiin=kirjata[X]muistiin[Bm]kirj:muistiinkirj Salata_a ;
-!!! [Lt][Xp]muistiin=kirjoittaa[X]muistiin[Bm]kirjo:muistiinkirjo Kirjoittaa_a ;
 [Lt][Xp]muistiin=lukea[X]muistiin[Bm]lu:muistiinlu Hakea_a ;
-!!!  [Lt][Xp]muistiin=merkitä[X]muistiin[Bm]merki:muistiinmerki Valita_ä ;
 [Lt][Xp]muistiin=palauttaa[X]muistiin[Bm]palaut:muistiinpalaut Alittaa_a ;
-!!! [Lt][Xp]muistiin=panna[X]muistiin[Bm]pan:muistiinpan Mennä_a ;

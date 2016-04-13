@@ -31,6 +31,7 @@
 #include "fst/Configuration.hpp"
 #include "setup/DictionaryException.hpp"
 #include "utf8/utf8.hpp"
+#include "utils/StringUtils.hpp"
 #include <sys/types.h>
 #include <cstring>
 
@@ -152,21 +153,33 @@ namespace libvoikko { namespace fst {
 		std::map<string, uint16_t> values;
 		values[""] = FlagValueNeutral;
 		values["@"] = FlagValueAny;
-		symbolToDiacritic.push_back(OpFeatureValue()); // epsilon
 		DEBUG("Reading " << symbolCount << " symbols to symbol table");
 		for (uint16_t i = 0; i < symbolCount; i++) {
-			string symbol(filePtr);
-			if (firstNormalChar == 0 && i > 0 && symbol[0] != '@') {
-				firstNormalChar = i;
+			wchar_t * ucs4Symbol = utils::StringUtils::ucs4FromUtf8(filePtr);
+			symbolToString.push_back(ucs4Symbol);
+			if (i == 0) {
+				symbolToDiacritic.push_back(OpFeatureValue()); // epsilon
+				symbolStringLength.push_back(0);
+				filePtr += 1;
 			}
-			if (firstNormalChar != 0 && firstMultiChar == 0 && symbol[0] == '[') {
-				firstMultiChar = i;
-			}
-			symbolToString.push_back(filePtr);
-			filePtr += (symbol.length() + 1);
-			stringToSymbol.insert(pair<string, uint16_t>(symbol, i));
-			if (firstNormalChar == 0 && i > 0) {
-				symbolToDiacritic.push_back(getDiacriticOperation(symbol, features, values));
+			else {
+				string symbol(filePtr);
+				if (firstNormalChar == 0) {
+					if (symbol[0] == '@') {
+						symbolToDiacritic.push_back(getDiacriticOperation(symbol, features, values));
+					}
+					else {
+						firstNormalChar = i;
+					}
+				}
+				else if (firstMultiChar == 0 && symbol[0] == '[') {
+					firstMultiChar = i;
+				}
+				symbolStringLength.push_back(wcslen(ucs4Symbol));
+				if (firstNormalChar > 0 && firstMultiChar == 0) {
+					stringToSymbol.insert(pair<wchar_t, uint16_t>(ucs4Symbol[0], i));
+				}
+				filePtr += (symbol.length() + 1);
 			}
 		}
 		flagDiacriticFeatureCount = features.size();
@@ -180,17 +193,21 @@ namespace libvoikko { namespace fst {
 		transitionStart = reinterpret_cast<WeightedTransition *>(filePtr);
 	}
 	
-	bool WeightedTransducer::prepare(WeightedConfiguration * configuration, const char * input, size_t inputLen) const {
+	WeightedTransducer::~WeightedTransducer() {
+		for (wchar_t * s : symbolToString) {
+			delete[] s;
+		}
+	}
+	
+	bool WeightedTransducer::prepare(WeightedConfiguration * configuration, const wchar_t * input, size_t inputLen) const {
 		configuration->stackDepth = 0;
+		configuration->flagDepth = 0;
 		configuration->inputDepth = 0;
 		configuration->stateIndexStack[0] = 0;
 		configuration->currentTransitionStack[0] = 0;
 		configuration->inputLength = 0;
-		const char * ip = input;
-		while (ip < input + inputLen) {
-			const char * prevIp = ip;
-			utf8::unchecked::next(ip);
-			std::map<std::string,uint16_t>::const_iterator it = stringToSymbol.find(string(prevIp, ip - prevIp));
+		while ((size_t)configuration->inputLength < inputLen) {
+			std::map<wchar_t,uint16_t>::const_iterator it = stringToSymbol.find(input[configuration->inputLength]);
 			if (it == stringToSymbol.end()) {
 				// Unknown symbol
 				return false;
@@ -212,76 +229,73 @@ namespace libvoikko { namespace fst {
 	
 	static bool flagDiacriticCheck(WeightedConfiguration * configuration, const Transducer * transducer, uint16_t symbol) {
 		uint16_t flagDiacriticFeatureCount = transducer->flagDiacriticFeatureCount;
-		if (!flagDiacriticFeatureCount) {
+		if (!flagDiacriticFeatureCount || symbol == 0) {
 			return true;
 		}
-		int stackDepth = configuration->stackDepth;
 		size_t diacriticCell = flagDiacriticFeatureCount * sizeof(uint32_t);
 		uint32_t * flagValueStack = configuration->flagValueStack;
-		uint32_t * currentFlagArray = flagValueStack + stackDepth * flagDiacriticFeatureCount;
+		uint32_t * currentFlagArray = flagValueStack + configuration->flagDepth * flagDiacriticFeatureCount;
 		
 		bool update = false;
-		OpFeatureValue ofv;
-		if (symbol != 0 && symbol < transducer->firstNormalChar) {
-			ofv = transducer->symbolToDiacritic[symbol];
-			uint32_t currentValue = currentFlagArray[ofv.feature];
-			DEBUG("checking op " << ofv.op << " " << ofv.feature << " " << ofv.value << " current value " << currentValue)
-			switch (ofv.op) {
-				case Operation_P:
+		OpFeatureValue ofv = transducer->symbolToDiacritic[symbol];
+		uint32_t currentValue = currentFlagArray[ofv.feature];
+		DEBUG("checking op " << ofv.op << " " << ofv.feature << " " << ofv.value << " current value " << currentValue)
+		switch (ofv.op) {
+			case Operation_P:
+				update = true;
+				break;
+			case Operation_C:
+				ofv.value = FlagValueNeutral;
+				update = true;
+				break;
+			case Operation_U:
+				if (currentValue) {
+					if (currentValue != ofv.value) {
+						return false;
+					}
+				}
+				else {
 					update = true;
-					break;
-				case Operation_C:
-					ofv.value = FlagValueNeutral;
-					update = true;
-					break;
-				case Operation_U:
-					if (currentValue) {
-						if (currentValue != ofv.value) {
-							return false;
-						}
-					}
-					else {
-						update = true;
-					}
-					break;
-				case Operation_R:
-					if (ofv.value == FlagValueAny && currentValue == FlagValueNeutral) {
-						return false;
-					}
-					if (ofv.value != FlagValueAny && currentValue != ofv.value) {
-						return false;
-					}
-					break;
-				case Operation_D:
-					if ((ofv.value == FlagValueAny && currentValue != FlagValueNeutral) || currentValue == ofv.value) {
-						return false;
-					}
-					break;
-				default:
-					return false;// this would be an error
-			}
-			DEBUG("allowed")
+				}
+				break;
+			case Operation_R:
+				if (ofv.value == FlagValueAny && currentValue == FlagValueNeutral) {
+					return false;
+				}
+				if (ofv.value != FlagValueAny && currentValue != ofv.value) {
+					return false;
+				}
+				break;
+			case Operation_D:
+				if ((ofv.value == FlagValueAny && currentValue != FlagValueNeutral) || currentValue == ofv.value) {
+					return false;
+				}
+				break;
+			default:
+				return false;// this would be an error
 		}
+		DEBUG("allowed")
 		
 		memcpy(currentFlagArray + flagDiacriticFeatureCount, currentFlagArray, diacriticCell);
 		if (update) {
 			DEBUG("updating feature " << ofv.feature << " to " << ofv.value)
 			(currentFlagArray + flagDiacriticFeatureCount)[ofv.feature] = ofv.value;
 		}
+		configuration->flagDepth++;
 		return true;
 	}
 	
-	bool WeightedTransducer::next(WeightedConfiguration * configuration, char * outputBuffer, size_t bufferLen) const {
+	bool WeightedTransducer::next(WeightedConfiguration * configuration, wchar_t * outputBuffer, size_t bufferLen) const {
 		int16_t weight;
 		return next(configuration, outputBuffer, bufferLen, &weight);
 	}
 	
-	bool WeightedTransducer::next(WeightedConfiguration * configuration, char * outputBuffer, size_t bufferLen, int16_t * weight) const {
+	bool WeightedTransducer::next(WeightedConfiguration * configuration, wchar_t * outputBuffer, size_t bufferLen, int16_t * weight) const {
 		int firstNotReachedPosition;
 		return next(configuration, outputBuffer, bufferLen, weight, &firstNotReachedPosition);
 	}
 	
-	bool WeightedTransducer::next(WeightedConfiguration * configuration, char * outputBuffer, size_t bufferLen, int16_t * weight, int * firstNotReachedPosition) const {
+	bool WeightedTransducer::next(WeightedConfiguration * configuration, wchar_t * outputBuffer, size_t bufferLen, int16_t * weight, int * firstNotReachedPosition) const {
 		uint32_t loopCounter = 0;
 		*firstNotReachedPosition = configuration->inputDepth;
 		while (loopCounter < MAX_LOOP_COUNT) {
@@ -289,6 +303,7 @@ namespace libvoikko { namespace fst {
 			WeightedTransition * currentTransition = transitionStart + configuration->currentTransitionStack[configuration->stackDepth];
 			uint32_t startTransitionIndex = currentTransition - stateHead;
 			uint32_t maxTc = getMaxTc(stateHead);
+			uint32_t inputSym = (configuration->inputDepth == configuration->inputLength) ? 0 : configuration->inputSymbolStack[configuration->inputDepth];
 			for (uint32_t tc = startTransitionIndex; tc <= maxTc; tc++) {
 				if (tc == 1 && maxTc >= 255) {
 					// skip overflow cell
@@ -299,18 +314,18 @@ namespace libvoikko { namespace fst {
 				if (currentTransition->symIn == 0xFFFFFFFF) {
 					// final state
 					if (configuration->inputDepth == configuration->inputLength) {
-						char * outputBufferPos = outputBuffer;
+						wchar_t * outputBufferPos = outputBuffer;
 						for (int i = 0; i < configuration->stackDepth; i++) {
-							const char * outputSym = symbolToString[configuration->outputSymbolStack[i]];
-							size_t symLen = strlen(outputSym);
+							uint32_t outSymIndex = configuration->outputSymbolStack[i];
+							size_t symLen = symbolStringLength[outSymIndex];
 							if ((outputBufferPos - outputBuffer) + symLen + 1 >= bufferLen) {
 								DEBUG("would overflow the output buffer")
 								return false;
 							}
-							strncpy(outputBufferPos, outputSym, symLen);
+							wcsncpy(outputBufferPos, symbolToString[outSymIndex], symLen);
 							outputBufferPos += symLen;
 						}
-						*outputBufferPos = '\0';
+						*outputBufferPos = L'\0';
 						configuration->currentTransitionStack[configuration->stackDepth] = currentTransition - transitionStart + 1;
 						*weight = currentTransition->weight;
 						for (int i = 0; i < configuration->stackDepth; i++) {
@@ -319,10 +334,12 @@ namespace libvoikko { namespace fst {
 						return true;
 					}
 				}
-				else if (((configuration->inputDepth < configuration->inputLength &&
-					  configuration->inputSymbolStack[configuration->inputDepth] == currentTransition->symIn) ||
-					  currentTransition->symIn < firstNormalChar) &&
-					  flagDiacriticCheck(configuration, this, currentTransition->symIn)) {
+				else if (inputSym == 0 && currentTransition->symIn >= firstNormalChar) {
+					// only normal transitions left but we don't have any input
+					break;
+				}
+				else if ((configuration->inputDepth < configuration->inputLength && inputSym == currentTransition->symIn) ||
+					 (currentTransition->symIn < firstNormalChar && flagDiacriticCheck(configuration, this, currentTransition->symIn))) {
 					// down
 					DEBUG("down " << tc)
 					if (configuration->stackDepth + 2 == configuration->bufferSize) {
@@ -343,6 +360,25 @@ namespace libvoikko { namespace fst {
 					}
 					goto nextInMainLoop;
 				}
+				else if (currentTransition->symIn > inputSym) {
+					break;
+				}
+				else if (tc >= 1 && currentTransition->symIn >= firstNormalChar &&
+				         currentTransition->symIn < inputSym) {
+					uint32_t min = 0;
+					uint32_t max = maxTc - tc;
+					while (min + 1 < max) {
+						uint32_t middle = (min + max) / 2;
+						if ((currentTransition + middle)->symIn < inputSym) {
+							min = middle;
+						}
+						else {
+							max = middle;
+						}
+					}
+					tc += min;
+					currentTransition += min;
+				}
 				currentTransition++;
 			}
 			if (configuration->stackDepth == 0) {
@@ -356,6 +392,9 @@ namespace libvoikko { namespace fst {
 				uint16_t previousInputSymbol = (transitionStart + configuration->currentTransitionStack[configuration->stackDepth])->symIn;
 				if (previousInputSymbol >= firstNormalChar) {
 					configuration->inputDepth--;
+				}
+				else if (flagDiacriticFeatureCount && previousInputSymbol != 0) {
+					configuration->flagDepth--;
 				}
 			}
 			configuration->currentTransitionStack[configuration->stackDepth]++;

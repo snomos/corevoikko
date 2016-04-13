@@ -1,3 +1,12 @@
+2016-01-30 Harri Pitkänen <hatapitk@iki.fi>
+	* Look harder for spelling suggestions.
+
+2016-01-24 Harri Pitkänen <hatapitk@iki.fi>
+	* Require compiler capable of supporting the C++11 standard.
+
+2016-01-22 Harri Pitkänen <hatapitk@iki.fi>
+	* Add user application data folder to dictionary search path on Windows
+
 2015-11-01 Harri Pitkänen <hatapitk@iki.fi>
 	* Enable HFST backend by default.
 

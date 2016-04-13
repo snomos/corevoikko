@@ -52,7 +52,7 @@ FinnishVfstAnalyzer::FinnishVfstAnalyzer(const string & directoryName) throw(set
 	string morFile = directoryName + "/mor.vfst";
 	transducer = new UnweightedTransducer(morFile.c_str());
 	configuration = new Configuration(transducer->getFlagDiacriticFeatureCount(), BUFFER_SIZE);
-	outputBuffer = new char[BUFFER_SIZE];
+	outputBuffer = new wchar_t[BUFFER_SIZE];
 	
 	classMap.insert(std::make_pair(L"n", L"nimisana"));
 	classMap.insert(std::make_pair(L"l", L"laatusana"));
@@ -178,78 +178,77 @@ static wchar_t * parseStructure(const wchar_t * fstOutput, size_t wlen) {
 	bool defaultTitleCase = false;
 	bool isAbbr = false;
 	for (size_t i = 0; i + 0 < outputLen; i++) {
-		if (wcsncmp(fstOutput + i, L"[Bc]", 4) == 0 || wcsncmp(fstOutput + i, L"[Bm]", 4) == 0) {
-			if (i == 1) {
-				structure[structurePos++] = L'=';
+		if (fstOutput[i] == L'[' && i + 2 < outputLen) {
+			if (i + 3 < outputLen && fstOutput[i + 1] == L'B' && fstOutput[i + 2] != L'h' && fstOutput[i + 3] == L']') {
+				if (i == 1) {
+					structure[structurePos++] = L'=';
+				}
+				if (charsSeen > charsFromDefault) {
+					createDefaultStructure(charsSeen - charsFromDefault, defaultTitleCase, structure, structurePos, isAbbr);
+					decreaseCharsMissing(charsMissing, charsSeen, charsFromDefault);
+				}
+				if (i != 1 && i + 5 < outputLen && structurePos > 0 && structure[structurePos - 1] != L'=') {
+					structure[structurePos++] = L'=';
+				}
+				i += 3;
+				charsSeen = 0;
+				charsFromDefault = 0;
 			}
-			if (charsSeen > charsFromDefault) {
-				createDefaultStructure(charsSeen - charsFromDefault, defaultTitleCase, structure, structurePos, isAbbr);
-				decreaseCharsMissing(charsMissing, charsSeen, charsFromDefault);
+			else if (i + 3 < outputLen && fstOutput[i + 1] == L'X' && fstOutput[i + 3] == L']') {
+				if (fstOutput[i + 2] == L'r') {
+					defaultTitleCase = false;
+					i += 4;
+					while (fstOutput[i] != L'[' && charsMissing) {
+						structure[structurePos++] = fstOutput[i];
+						if (fstOutput[i] != L'=') {
+							charsFromDefault++;
+							if (fstOutput[i] != L'-') {
+								charsMissing--;
+							}
+						}
+						i++;
+					}
+					i += 2; // X]
+				}
+				else {
+					i += 4;
+					while (fstOutput[i] != L'[') {
+						i++;
+					}
+					i += 2;
+				}
 			}
-			if (i != 1 && i + 5 < outputLen && structurePos > 0 && structure[structurePos - 1] != L'=') {
-				structure[structurePos++] = L'=';
-			}
-			i += 3;
-			charsSeen = 0;
-			charsFromDefault = 0;
-		}
-		else if (wcsncmp(fstOutput + i, L"[Xr]", 4) == 0) {
-			defaultTitleCase = false;
-			i += 4;
-			while (fstOutput[i] != L'[' && charsMissing) {
-				structure[structurePos++] = fstOutput[i];
-				if (fstOutput[i] != L'=') {
-					charsFromDefault++;
-					if (fstOutput[i] != L'-') {
-						charsMissing--;
+			else if (i + 3 < outputLen && fstOutput[i + 1] == L'L') {
+				if (fstOutput[i + 2] == L'e') {
+					defaultTitleCase = true;
+					isAbbr = false;
+					i += 4;
+				}
+				else if (fstOutput[i + 2] == L'n' && fstOutput[i + 3] == L'l') {
+					isAbbr = false;
+					i += 4;
+				}
+				else if (fstOutput[i + 2] == L'a') {
+					isAbbr = true;
+					i += 3;
+				}
+				else if (fstOutput[i + 2] == L'u' && i + 5 < outputLen &&
+					 (fstOutput[i + 3] == L'r' || StringUtils::isInteger(fstOutput[i + 4]))) {
+					isAbbr = true;
+					i += 3;
+					if (fstOutput[i] == L'r') {
+						i++;
 					}
 				}
-				i++;
+				else {
+					isAbbr = false;
+					i += 3;
+				}
 			}
-			i += 2; // X]
-		}
-		else if (wcsncmp(fstOutput + i, L"[Le", 3) == 0) {
-			defaultTitleCase = true;
-			isAbbr = false;
-			i += 4;
-		}
-		else if (wcsncmp(fstOutput + i, L"[Lnl", 4) == 0) {
-			isAbbr = false;
-			i += 4;
-		}
-		else if (wcsncmp(fstOutput + i, L"[La", 3) == 0) {
-			isAbbr = true;
-			i += 3;
-		}
-		else if (wcsncmp(fstOutput + i, L"[Lu", 3) == 0 && i + 5 < outputLen &&
-			 (fstOutput[i + 3] == L'r' || StringUtils::isInteger(fstOutput[i + 4]))) {
-			isAbbr = true;
-			i += 3;
-			if (fstOutput[i] == L'r') {
-				i++;
-			}
-		}
-		else if (wcsncmp(fstOutput + i, L"[L", 2) == 0) {
-			isAbbr = false;
-			i += 3;
-		}
-		else if (wcsncmp(fstOutput + i, L"[Xp", 3) == 0 || wcsncmp(fstOutput + i, L"[Xj", 3) == 0) {
-			i += 4;
-			while (fstOutput[i] != L'[') {
-				i++;
-			}
-			i += 2;
-		}
-		else if (wcsncmp(fstOutput + i, L"[Xs", 3) == 0) {
-			i += 4;
-			while (fstOutput[i] != L'[') {
-				i++;
-			}
-			i += 2;
-		}
-		else if (fstOutput[i] == L'[') {
-			while (fstOutput[i] != L']') {
-				i++;
+			else {
+				while (fstOutput[i] != L']') {
+					i++;
+				}
 			}
 		}
 		else if (fstOutput[i] == L'-') {
@@ -299,23 +298,23 @@ static wchar_t * parseStructure(const wchar_t * fstOutput, size_t wlen) {
 	return structure;
 }
 
-static wchar_t * getAttributeFromMap(map<wstring, wstring> & theMap, const wchar_t * keyStart, size_t keyLen) {
-	map<wstring, wstring>::const_iterator mapIterator = theMap.find(wstring(keyStart, keyLen));
+static const wchar_t * getAttributeFromMap(map<wstring, const wchar_t *> & theMap, const wchar_t * keyStart, size_t keyLen) {
+	map<wstring, const wchar_t *>::const_iterator mapIterator = theMap.find(wstring(keyStart, keyLen));
 	if (mapIterator == theMap.end()) {
-		return 0;
+		return nullptr;
 	}
-	return StringUtils::copy((*mapIterator).second.c_str());
+	return mapIterator->second;
 }
 
 static void parseBasicAttribute(Analysis * analysis, const wchar_t * fstOutput, size_t i, size_t j,
-			        const char * attributeName, map<wstring, wstring> & theMap) {
-	if (analysis->getValue(attributeName)) {
+			        Analysis::Key key, map<wstring, const wchar_t *> & theMap) {
+	if (analysis->getValue(key)) {
 		return; // already set
 	}
 	size_t sijaLen = i - j - 2;
-	wchar_t * muoto = getAttributeFromMap(theMap, fstOutput + j + 2, sijaLen);
+	const wchar_t * muoto = getAttributeFromMap(theMap, fstOutput + j + 2, sijaLen);
 	if (muoto) {
-		analysis->addAttribute(attributeName, muoto);
+		analysis->addConstAttribute(key, muoto);
 	}
 }
 
@@ -336,33 +335,39 @@ static bool isValidAnalysis(const wchar_t * fstOutput, size_t len) {
 				// something wrong with the pattern
 				return false;
 			}
-			if (i + 3 < len && wcsncmp(fstOutput + i + 1, L"Isf", 3) == 0) {
-				hyphenUnconditionallyAllowed = true;
-				hyphenUnconditionallyAllowedJustSet = true;
-			}
-			else if (i + 3 < len && wcsncmp(fstOutput + i + 1, L"Icu", 3) == 0) {
-				boundaryPassed = false;
-				hyphenUnconditionallyAllowed = true;
-				hyphenRequired = true;
-			}
-			else if (i + 3 < len && wcsncmp(fstOutput + i + 1, L"Ica", 3) == 0) {
-				requiredHyphenMissing = false;
-				endsWithNonIcaNoun = false;
-			}
-			else if (i + 3 < len && wcsncmp(fstOutput + i + 1, L"Le", 2) == 0) {
-				startsWithProperNoun = true; // TODO starts?
-				endsWithNonIcaNoun = false;
-			}
-			else if (i + 2 < len && wcsncmp(fstOutput + i + 1, L"Ln", 2) == 0) {
-				endsWithNonIcaNoun = true;
-			}
-			else if (i + 2 < len && wcsncmp(fstOutput + i + 1, L"Dg", 2) == 0) {
-				startsWithProperNoun = false;
+			if (i + 3 < len) {
+				if (fstOutput[i + 1] == L'I') {
+					if (wcsncmp(fstOutput + i + 2, L"sf", 2) == 0) {
+						hyphenUnconditionallyAllowed = true;
+						hyphenUnconditionallyAllowedJustSet = true;
+					}
+					else if (wcsncmp(fstOutput + i + 2, L"cu", 2) == 0) {
+						boundaryPassed = false;
+						hyphenUnconditionallyAllowed = true;
+						hyphenRequired = true;
+					}
+					else if (wcsncmp(fstOutput + i + 2, L"ca", 2) == 0) {
+						requiredHyphenMissing = false;
+						endsWithNonIcaNoun = false;
+					}
+				}
+				else if (fstOutput[i + 1] == L'L') {
+					if (fstOutput[i + 2] == L'e') {
+						startsWithProperNoun = true; // TODO starts?
+						endsWithNonIcaNoun = false;
+					}
+					else if (fstOutput[i + 2] == L'n') {
+						endsWithNonIcaNoun = true;
+					}
+				}
+				else if (wcsncmp(fstOutput + i + 1, L"Dg", 2) == 0) {
+					startsWithProperNoun = false;
+				}
 			}
 			if (fstOutput[i + 1] == L'X') {
 				while (i + 3 < len) {
 					i++;
-					if (wcsncmp(fstOutput + i, L"[X]", 3) == 0) {
+					if (fstOutput[i] == L'[' && fstOutput[i + 1] == L'X' && fstOutput[i + 2] == L']') {
 						i += 2;
 						break;
 					}
@@ -426,26 +431,26 @@ static bool isValidAnalysis(const wchar_t * fstOutput, size_t len) {
 }
 
 static void addInfoFlag(Analysis * analysis, const wchar_t * outputPosition, const wchar_t * outputBuffer) {
-	const wchar_t * className = analysis->getValue("CLASS");
+	const wchar_t * className = analysis->getValue(Analysis::Key::CLASS);
 	if (wcsncmp(outputPosition, L"vj", 2) == 0) {
 		if (outputBuffer[0] != L'-') {
-			analysis->addAttribute("MALAGA_VAPAA_JALKIOSA", StringUtils::copy(L"true"));
+			analysis->addConstAttribute(Analysis::Key::MALAGA_VAPAA_JALKIOSA, L"true");
 		}
 	}
 	else if (wcsncmp(outputPosition, L"ca", 2) == 0) {
 		if (!wcsstr(outputPosition, L"[Bc]") && !wcsstr(outputPosition, L"[Ll]") && (!className || wcsncmp(className, L"nimisana", 8) == 0)) {
-			analysis->addAttribute("POSSIBLE_GEOGRAPHICAL_NAME", StringUtils::copy(L"true"));
+			analysis->addConstAttribute(Analysis::Key::POSSIBLE_GEOGRAPHICAL_NAME, L"true");
 		}
 	}
 	else {
-		const wchar_t * mood = analysis->getValue("MOOD");
+		const wchar_t * mood = analysis->getValue(Analysis::Key::MOOD);
 		if ((!mood || (wcscmp(mood, L"E-infinitive") != 0 && wcscmp(mood, L"MINEN-infinitive") != 0 && wcscmp(mood, L"MA-infinitive") != 0)) &&
 		    (!className || wcscmp(className, L"teonsana") == 0)) {
 			if (wcsncmp(outputPosition, L"ra", 2) == 0) {
-				analysis->addAttribute("REQUIRE_FOLLOWING_VERB", StringUtils::copy(L"A-infinitive"));
+				analysis->addConstAttribute(Analysis::Key::REQUIRE_FOLLOWING_VERB, L"A-infinitive");
 			}
 			else if (wcsncmp(outputPosition, L"rm", 2) == 0) {
-				analysis->addAttribute("REQUIRE_FOLLOWING_VERB", StringUtils::copy(L"MA-infinitive"));
+				analysis->addConstAttribute(Analysis::Key::REQUIRE_FOLLOWING_VERB, L"MA-infinitive");
 			}
 		}
 	}
@@ -545,22 +550,31 @@ static wchar_t * parseBaseform(const wchar_t * fstOutput, size_t fstLen, const w
 				delete[] baseform;
 				return 0;
 			}
-			if (i + 6 < fstLen && (wcsncmp(fstOutput + i, L"[Xp]", 4) == 0 || wcsncmp(fstOutput + i, L"[Xj]", 4) == 0)) {
-				i += 3;
-				isInXp = true;
-				latestXpStartInFst = i + 1;
-				latestXpStartInBaseform = baseformPos;
-				hyphensInLatestXp = 0;
+			if (fstOutput[i + 1] == L'X') {
+				if (fstOutput[i + 2] == L']') {
+					isInXp = false;
+					isInXr = false;
+					i += 2;
+				}
+				else if (i + 6 < fstLen && fstOutput[i + 3] == L']') {
+					if (fstOutput[i + 2] == L'p' || fstOutput[i + 2] == L'j') {
+						i += 3;
+						isInXp = true;
+						latestXpStartInFst = i + 1;
+						latestXpStartInBaseform = baseformPos;
+						hyphensInLatestXp = 0;
+					}
+					else if (fstOutput[i + 2] == L'r') {
+						i += 3;
+						isInXr = true;
+					}
+					else if (fstOutput[i + 2] == L's') {
+						i += 3;
+						isInXr = true;
+					}
+				}
 			}
-			else if (i + 6 < fstLen && wcsncmp(fstOutput + i, L"[Xr]", 4) == 0) {
-				i += 3;
-				isInXr = true;
-			}
-			else if (i + 6 < fstLen && wcsncmp(fstOutput + i, L"[Xs]", 4) == 0) {
-				i += 3;
-				isInXr = true;
-			}
-			else if (!classTagSeen && i + 6 < fstLen && wcsncmp(fstOutput + i, L"[Lu]", 4) == 0) {
+			else if (!classTagSeen && i + 6 < fstLen && wcsncmp(fstOutput + i + 1, L"Lu]", 3) == 0) {
 				i += 3;
 				classTagSeen = true;
 				// we will try completely different rules here and get back if it does not work out
@@ -569,12 +583,7 @@ static wchar_t * parseBaseform(const wchar_t * fstOutput, size_t fstLen, const w
 					return baseform;
 				}
 			}
-			else if (wcsncmp(fstOutput + i, L"[X]", 3) == 0) {
-				isInXp = false;
-				isInXr = false;
-				i += 2;
-			}
-			else if (wcsncmp(fstOutput + i, L"[De]", 4) == 0) {
+			else if (wcsncmp(fstOutput + i + 1, L"De]", 3) == 0) {
 				isDe = !ignoreNextDe;
 				i += 3;
 			}
@@ -663,7 +672,7 @@ static wchar_t * parseBaseform(const wchar_t * fstOutput, size_t fstLen, const w
 }
 
 void FinnishVfstAnalyzer::duplicateOrgName(Analysis * analysis, const wchar_t * fstOutput, std::list<Analysis *> * analysisList) {
-	const wchar_t * oldClass = analysis->getValue("CLASS");
+	const wchar_t * oldClass = analysis->getValue(Analysis::Key::CLASS);
 	if (!oldClass || wcscmp(oldClass, L"nimisana") != 0) {
 		return;
 	}
@@ -685,14 +694,12 @@ void FinnishVfstAnalyzer::duplicateOrgName(Analysis * analysis, const wchar_t * 
 			for (size_t j = i - 4; j >= 4; j--) {
 				if (wcsncmp(fstOutput + j, L"[Bc]", 4) == 0) {
 					Analysis * newAnalysis = new Analysis();
-					const char ** keys = analysis->getKeys();
 					wchar_t * newStructure = 0;
-					for (const char ** keyPtr = keys; *keyPtr; keyPtr++) {
-						const char * key = *keyPtr;
-						if (strcmp(key, "CLASS") == 0) {
-							newAnalysis->addAttribute(key, StringUtils::copy(L"nimi"));
+					for (Analysis::Key key : analysis->getInternalKeys()) {
+						if (key == Analysis::Key::CLASS) {
+							newAnalysis->addConstAttribute(key, L"nimi");
 						}
-						else if (strcmp(key, "STRUCTURE") == 0) {
+						else if (key == Analysis::Key::STRUCTURE) {
 							const wchar_t * oldStructure = analysis->getValue(key);
 							size_t structureLen = wcslen(oldStructure);
 							if (structureLen >= 2) {
@@ -701,7 +708,7 @@ void FinnishVfstAnalyzer::duplicateOrgName(Analysis * analysis, const wchar_t * 
 								newAnalysis->addAttribute(key, newStructure);
 							}
 						}
-						else if (strcmp(key, "POSSIBLE_GEOGRAPHICAL_NAME") == 0) {
+						else if (key == Analysis::Key::POSSIBLE_GEOGRAPHICAL_NAME) {
 							// skip
 						}
 						else {
@@ -711,7 +718,7 @@ void FinnishVfstAnalyzer::duplicateOrgName(Analysis * analysis, const wchar_t * 
 					if (newStructure) {
 						wchar_t * baseform = parseBaseform(fstOutput, fstLen, newStructure);
 						if (baseform) {
-							newAnalysis->addAttribute("BASEFORM", baseform);
+							newAnalysis->addAttribute(Analysis::Key::BASEFORM, baseform);
 						}
 					}
 					analysisList->push_back(newAnalysis);
@@ -860,7 +867,6 @@ void FinnishVfstAnalyzer::parseDebugAttributes(Analysis * analysis, const wchar_
 		wcsncpy(wordBases + basepos, xpBuffer, xppos);
 		basepos += xppos;
 		wordBases[basepos++] = L')';
-		xppos = 0;
 	}
 	if (xspos > 0) {
 		wordIds[idpos++] = L'(';
@@ -868,24 +874,24 @@ void FinnishVfstAnalyzer::parseDebugAttributes(Analysis * analysis, const wchar_
 		wcsncpy(wordIds + idpos, xsBuffer, xspos);
 		idpos += xspos;
 		wordIds[idpos++] = L')';
-		xspos = 0;
 	}
 	wordIds[idpos] = L'\0';
 	wordBases[basepos] = L'\0';
 	delete[] xsBuffer;
 	delete[] xpBuffer;
 	if (anyXs) {
-		analysis->addAttribute("WORDIDS", wordIds);
+		analysis->addAttribute(Analysis::Key::WORDIDS, wordIds);
 	}
 	else {
 		delete[] wordIds;
 	}
-	analysis->addAttribute("WORDBASES", wordBases);
+	analysis->addAttribute(Analysis::Key::WORDBASES, wordBases);
 }
 
 void FinnishVfstAnalyzer::parseBasicAttributes(Analysis * analysis, const wchar_t * fstOutput, size_t fstLen) {
 	bool convertNimiLaatusanaToLaatusana = false;
 	bool bcPassed = false;
+	bool classSet = false;
 	for (size_t i = fstLen - 1; i >= 2; i--) {
 		if (fstOutput[i] == L']') {
 			size_t j = i;
@@ -893,72 +899,75 @@ void FinnishVfstAnalyzer::parseBasicAttributes(Analysis * analysis, const wchar_
 				j--;
 				if (fstOutput[j] == L'[') {
 					if (fstOutput[j + 1] == L'L') {
-						if (wcsncmp(fstOutput + (j + 2), L"nl", 2) == 0) {
-							const wchar_t * comp = analysis->getValue("COMPARISON");
-							if (convertNimiLaatusanaToLaatusana || (comp && (wcscmp(comp, L"comparative") == 0 || wcscmp(comp, L"superlative") == 0)) ||
-							    wcsncmp(fstOutput, L"[Lu]", 4) == 0) {
-								analysis->addAttribute("CLASS", StringUtils::copy(L"laatusana"));
+						if (!classSet || fstOutput[j + 2] == L']') { // TODO check for ']' is for compatibility with voikko-fi 2.0
+							if (wcsncmp(fstOutput + (j + 2), L"nl", 2) == 0) {
+								const wchar_t * comp = analysis->getValue(Analysis::Key::COMPARISON);
+								if (convertNimiLaatusanaToLaatusana || (comp && (wcscmp(comp, L"comparative") == 0 || wcscmp(comp, L"superlative") == 0)) ||
+								    wcsncmp(fstOutput, L"[Lu]", 4) == 0) {
+									analysis->addConstAttribute(Analysis::Key::CLASS, L"laatusana");
+								}
+								else {
+									analysis->addConstAttribute(Analysis::Key::CLASS, L"nimisana_laatusana");
+								}
 							}
 							else {
-								analysis->addAttribute("CLASS", StringUtils::copy(L"nimisana_laatusana"));
+								parseBasicAttribute(analysis, fstOutput, i, j, Analysis::Key::CLASS, classMap);
 							}
-						}
-						else {
-							parseBasicAttribute(analysis, fstOutput, i, j, "CLASS", classMap);
+							classSet = true;
 						}
 					}
 					else if (fstOutput[j + 1] == L'N') {
-						const wchar_t * wclass = analysis->getValue("CLASS");
+						const wchar_t * wclass = analysis->getValue(Analysis::Key::CLASS);
 						if (!wclass || (wcscmp(wclass, L"etuliite") != 0 && wcscmp(wclass, L"seikkasana") != 0)) {
-							parseBasicAttribute(analysis, fstOutput, i, j, "NUMBER", numberMap);
+							parseBasicAttribute(analysis, fstOutput, i, j, Analysis::Key::NUMBER, numberMap);
 						}
 					}
 					else if (fstOutput[j + 1] == L'P') {
-						parseBasicAttribute(analysis, fstOutput, i, j, "PERSON", personMap);
+						parseBasicAttribute(analysis, fstOutput, i, j, Analysis::Key::PERSON, personMap);
 					}
 					else if (fstOutput[j + 1] == L'S') {
-						const wchar_t * wclass = analysis->getValue("CLASS");
+						const wchar_t * wclass = analysis->getValue(Analysis::Key::CLASS);
 						if (!wclass || (wcscmp(wclass, L"etuliite") != 0 && wcscmp(wclass, L"seikkasana") != 0)) {
-							parseBasicAttribute(analysis, fstOutput, i, j, "SIJAMUOTO", sijamuotoMap);
+							parseBasicAttribute(analysis, fstOutput, i, j, Analysis::Key::SIJAMUOTO, sijamuotoMap);
 							if (j + 5 < fstLen && wcsncmp(fstOutput + (j + 2), L"sti", 3) == 0) {
 								convertNimiLaatusanaToLaatusana = true;
 							}
 						}
 					}
 					else if (fstOutput[j + 1] == L'T') {
-						if (!analysis->getValue("CLASS")) {
-							parseBasicAttribute(analysis, fstOutput, i, j, "MOOD", moodMap);
+						if (!analysis->getValue(Analysis::Key::CLASS)) {
+							parseBasicAttribute(analysis, fstOutput, i, j, Analysis::Key::MOOD, moodMap);
 						}
 					}
 					else if (fstOutput[j + 1] == L'A') {
-						parseBasicAttribute(analysis, fstOutput, i, j, "TENSE", tenseMap);
+						parseBasicAttribute(analysis, fstOutput, i, j, Analysis::Key::TENSE, tenseMap);
 					}
 					else if (fstOutput[j + 1] == L'F') {
 						if (wcsncmp(fstOutput + (j + 2), L"ko", 2) == 0) {
-							analysis->addAttribute("KYSYMYSLIITE", StringUtils::copy(L"true"));
+							analysis->addConstAttribute(Analysis::Key::KYSYMYSLIITE, L"true");
 						}
 						else {
-							parseBasicAttribute(analysis, fstOutput, i, j, "FOCUS", focusMap);
+							parseBasicAttribute(analysis, fstOutput, i, j, Analysis::Key::FOCUS, focusMap);
 						}
 					}
 					else if (fstOutput[j + 1] == L'O') {
-						parseBasicAttribute(analysis, fstOutput, i, j, "POSSESSIVE", possessiveMap);
+						parseBasicAttribute(analysis, fstOutput, i, j, Analysis::Key::POSSESSIVE, possessiveMap);
 					}
 					else if (fstOutput[j + 1] == L'C') {
-						if (!analysis->getValue("CLASS")) {
-							parseBasicAttribute(analysis, fstOutput, i, j, "COMPARISON", comparisonMap);
+						if (!analysis->getValue(Analysis::Key::CLASS)) {
+							parseBasicAttribute(analysis, fstOutput, i, j, Analysis::Key::COMPARISON, comparisonMap);
 						}
 					}
 					else if (fstOutput[j + 1] == L'E') {
-						parseBasicAttribute(analysis, fstOutput, i, j, "NEGATIVE", negativeMap);
+						parseBasicAttribute(analysis, fstOutput, i, j, Analysis::Key::NEGATIVE, negativeMap);
 					}
 					else if (fstOutput[j + 1] == L'R') {
 						if (!bcPassed) {
-							const wchar_t * wclass = analysis->getValue("CLASS");
+							const wchar_t * wclass = analysis->getValue(Analysis::Key::CLASS);
 							// TODO: Checking the end for [Ln] is done to handle -tUAnne ("kuunneltuanne"). This is for compatibility
 							// with Malaga implementation. See VISK § 543 (temporaalirakenne) for correct analysis.
 							if (!wclass || wcscmp(wclass, L"laatusana") == 0 || wcscmp(fstOutput + (fstLen - 4), L"[Ln]") == 0) {
-								parseBasicAttribute(analysis, fstOutput, i, j, "PARTICIPLE", participleMap);
+								parseBasicAttribute(analysis, fstOutput, i, j, Analysis::Key::PARTICIPLE, participleMap);
 							}
 						}
 					}
@@ -967,8 +976,10 @@ void FinnishVfstAnalyzer::parseBasicAttributes(Analysis * analysis, const wchar_
 					}
 					else if (fstOutput[j + 1] == L'B') {
 						if (j >= 5 && fstOutput[j + 2] == L'c') {
-							if (!analysis->getValue("CLASS") && (fstOutput[j - 1] == L'-' || wcsncmp(fstOutput + (j - 5), L"-[Bh]", 5) == 0)) {
-								analysis->addAttribute("CLASS", StringUtils::copy(L"etuliite"));
+							if (!classSet && !analysis->getValue(Analysis::Key::CLASS) &&
+							    (fstOutput[j - 1] == L'-' || wcsncmp(fstOutput + (j - 5), L"-[Bh]", 5) == 0)) {
+								analysis->addConstAttribute(Analysis::Key::CLASS, L"etuliite");
+								classSet = true;
 							}
 							bcPassed = true;
 						}
@@ -988,24 +999,28 @@ static void fixStructure(wchar_t * structure, wchar_t * fstOutput, size_t fstLen
 	bool isDe = false;
 	size_t hyphenCount = 0;
 	for (size_t j = 0; j < fstLen; j++) {
-		if (j + 3 < fstLen && wcsncmp(fstOutput + j, L"[Dg]", 4) == 0) {
-			size_t hyphensInStructure = 0;
-			for (size_t i = 0; structure[i]; i++) {
-				if (structure[i] == L'i') {
-					if (hyphensInStructure == hyphenCount) {
-						structure[i] = L'p';
+		if (j + 3 < fstLen && fstOutput[j] == L'[') {
+			if (fstOutput[j + 1] == 'D') {
+				if (fstOutput[j + 2] == 'g') {
+					size_t hyphensInStructure = 0;
+					for (size_t i = 0; structure[i]; i++) {
+						if (structure[i] == L'i') {
+							if (hyphensInStructure == hyphenCount) {
+								structure[i] = L'p';
+							}
+						}
+						else if (structure[i] == L'-') {
+							hyphensInStructure++;
+						}
 					}
 				}
-				else if (structure[i] == L'-') {
-					hyphensInStructure++;
+				else if (fstOutput[j + 2] == 'e') {
+					isDe = true;
 				}
 			}
-		}
-		else if (j + 3 < fstLen && wcsncmp(fstOutput + j, L"[De]", 4) == 0) {
-			isDe = true;
-		}
-		else if (j + 3 < fstLen && wcsncmp(fstOutput + j, L"[Ln]", 4) == 0) {
-			isDe = false;
+			else if (wcsncmp(fstOutput + j + 1, L"Ln]", 3) == 0) {
+				isDe = false;
+			}
 		}
 		else if (fstOutput[j] == L'-') {
 			hyphenCount++;
@@ -1040,68 +1055,58 @@ list<Analysis *> * FinnishVfstAnalyzer::analyze(const wchar_t * word, size_t wle
 	wchar_t * wordLowerUcs4 = new wchar_t[wlen];
 	memcpy(wordLowerUcs4, word, wlen * sizeof(wchar_t));
 	voikko_set_case(CT_ALL_LOWER, wordLowerUcs4, wlen);
-	char * wordLower = StringUtils::utf8FromUcs4(wordLowerUcs4, wlen);
-	delete[] wordLowerUcs4;
-	if (!wordLower) {
-		return analysisList;
-	}
 	
-	if (transducer->prepare(configuration, wordLower, strlen(wordLower))) {
+	if (transducer->prepare(configuration, wordLowerUcs4, wlen)) {
 		int analysisCount = 0;
 		while (++analysisCount < MAX_ANALYSIS_COUNT && transducer->next(configuration, outputBuffer, BUFFER_SIZE)) {
-			wchar_t * fstOutput = StringUtils::ucs4FromUtf8(outputBuffer);
-			size_t fstLen = wcslen(fstOutput);
-			if (!isValidAnalysis(fstOutput, fstLen)) {
-				delete[] fstOutput;
+			size_t fstLen = wcslen(outputBuffer);
+			if (!isValidAnalysis(outputBuffer, fstLen)) {
 				continue;
 			}
 			Analysis * analysis = new Analysis();
-			wchar_t * structure = parseStructure(fstOutput, wlen);
-			parseBasicAttributes(analysis, fstOutput, fstLen);
-			fixStructure(structure, fstOutput, fstLen);
-			analysis->addAttribute("STRUCTURE", structure);
-			const wchar_t * wclass = analysis->getValue("CLASS");
-			const wchar_t * sijamuoto = analysis->getValue("SIJAMUOTO");
-			const wchar_t * mood = analysis->getValue("MOOD");
-			const wchar_t * participle = analysis->getValue("PARTICIPLE");
-			if (analysis->getValue("NEGATIVE") && ((wclass && wcscmp(wclass, L"teonsana") != 0) ||
+			wchar_t * structure = parseStructure(outputBuffer, wlen);
+			parseBasicAttributes(analysis, outputBuffer, fstLen);
+			fixStructure(structure, outputBuffer, fstLen);
+			analysis->addAttribute(Analysis::Key::STRUCTURE, structure);
+			const wchar_t * wclass = analysis->getValue(Analysis::Key::CLASS);
+			const wchar_t * sijamuoto = analysis->getValue(Analysis::Key::SIJAMUOTO);
+			const wchar_t * mood = analysis->getValue(Analysis::Key::MOOD);
+			const wchar_t * participle = analysis->getValue(Analysis::Key::PARTICIPLE);
+			if (analysis->getValue(Analysis::Key::NEGATIVE) && ((wclass && wcscmp(wclass, L"teonsana") != 0) ||
 			    (mood && (wcscmp(mood, L"MINEN-infinitive") == 0 || wcscmp(mood, L"E-infinitive") == 0 || wcscmp(mood, L"MA-infinitive") == 0))
 			)) {
-				analysis->removeAttribute("NEGATIVE");
+				analysis->removeAttribute(Analysis::Key::NEGATIVE);
 			}
 			if (participle && wcscmp(participle, L"past_passive") == 0 && (!wclass || wcscmp(participle, L"laatusana") != 0)) {
 				wclass = L"laatusana";
-				analysis->removeAttribute("CLASS");
-				analysis->addAttribute("CLASS", StringUtils::copy(wclass));
+				analysis->removeAttribute(Analysis::Key::CLASS);
+				analysis->addConstAttribute(Analysis::Key::CLASS, wclass);
 			}
-			if (analysis->getValue("NUMBER") && sijamuoto && wcscmp(sijamuoto, L"kerrontosti") == 0) {
-				analysis->removeAttribute("NUMBER");
+			if (analysis->getValue(Analysis::Key::NUMBER) && sijamuoto && wcscmp(sijamuoto, L"kerrontosti") == 0) {
+				analysis->removeAttribute(Analysis::Key::NUMBER);
 			}
-			if (!analysis->getValue("COMPARISON")) {
+			if (!analysis->getValue(Analysis::Key::COMPARISON)) {
 				if (wclass && (wcscmp(wclass, L"laatusana") == 0 || wcscmp(wclass, L"nimisana_laatusana") == 0)) {
-					analysis->addAttribute("COMPARISON", StringUtils::copy(L"positive"));
+					analysis->addConstAttribute(Analysis::Key::COMPARISON, L"positive");
 				}
 			}
 			else if (wclass && (wcscmp(wclass, L"nimisana") == 0)) {
-				analysis->removeAttribute("COMPARISON");
+				analysis->removeAttribute(Analysis::Key::COMPARISON);
 			}
 			analysisList->push_back(analysis);
-			duplicateOrgName(analysis, fstOutput, analysisList);
+			duplicateOrgName(analysis, outputBuffer, analysisList);
 			if (fullMorphology) {
-				analysis->addAttribute("FSTOUTPUT", fstOutput);
-				wchar_t * baseform = parseBaseform(fstOutput, fstLen, structure);
+				analysis->addAttribute(Analysis::Key::FSTOUTPUT, StringUtils::copy(outputBuffer));
+				wchar_t * baseform = parseBaseform(outputBuffer, fstLen, structure);
 				if (baseform) {
-					analysis->addAttribute("BASEFORM", baseform);
+					analysis->addAttribute(Analysis::Key::BASEFORM, baseform);
 				}
-				parseDebugAttributes(analysis, fstOutput, fstLen);
-			}
-			else {
-				delete[] fstOutput;
+				parseDebugAttributes(analysis, outputBuffer, fstLen);
 			}
 		}
 	}
 	
-	delete[] wordLower;
+	delete[] wordLowerUcs4;
 	return analysisList;
 }
 
